@@ -5,18 +5,27 @@ A comprehensive restaurant platform for Fulala featuring real-time ordering, tab
 ## Quick Start
 
 ```bash
-# Navigate to the main project
-cd fulala-public
-
 # Install dependencies
-npm install
+bun install && bun run install:app
 
-# Start Convex dev server (new terminal)
-npx convex dev
+# Option 1: Run both servers together
+bun run dev:all
 
-# Start SvelteKit dev server
-npm run dev
+# Option 2: Run separately (two terminals)
+bun run dev          # Terminal 1: SvelteKit
+bun run dev:convex   # Terminal 2: Convex
 ```
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start SvelteKit dev server |
+| `bun run dev:convex` | Start Convex dev server |
+| `bun run dev:all` | Start both concurrently |
+| `bun run build` | Build for production |
+| `bun run preview` | Preview production build |
+| `bun run test` | Run E2E tests |
 
 **URLs:**
 | Service | URL |
