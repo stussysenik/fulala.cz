@@ -4,12 +4,13 @@
 1. [Architecture Overview](#architecture-overview)
 2. [Frontend (SvelteKit)](#frontend-sveltekit)
 3. [Backend (Convex)](#backend-convex)
-4. [Authentication](#authentication)
-5. [Components](#components)
-6. [Routes](#routes)
-7. [Database Schema](#database-schema)
-8. [API Reference](#api-reference)
-9. [Deployment](#deployment)
+4. [Convex-Svelte Integration](#convex-svelte-integration)
+5. [Authentication](#authentication)
+6. [Components](#components)
+7. [Routes](#routes)
+8. [Database Schema](#database-schema)
+9. [API Reference](#api-reference)
+10. [Deployment](#deployment)
 
 ---
 
@@ -45,6 +46,7 @@ Fulala v2 is a unified SvelteKit application with both public-facing pages and a
 - **SvelteKit 2.49** with Svelte 5 runes ($state, $derived, $effect)
 - **Tailwind CSS v4** with custom brand colors
 - **Convex** for real-time database and file storage
+- **convex-svelte** for Svelte-native Convex integration
 - **bits-ui** for headless UI components
 
 ---
@@ -100,17 +102,108 @@ $effect(() => {
 });
 ```
 
-### Convex Integration
+---
+
+## Convex-Svelte Integration
+
+### IMPORTANT: Correct API Patterns
+
+The `convex-svelte` library has specific API patterns that must be followed:
+
+### Queries - Use Arrow Function for Args
+
 ```typescript
-import { useQuery, useMutation } from 'convex/svelte';
-import { api } from '../convex/_generated/api';
+import { useQuery } from 'convex-svelte';
+import { api } from '$convex/_generated/api';
 
-// Real-time query
-const menuItems = useQuery(api.menu.list, {});
+// CORRECT - args wrapped in arrow function
+const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+const categoryQuery = useQuery(api.categories.get, () => ({ id: categoryId }));
 
-// Mutation
-const createItem = useMutation(api.menu.create);
-await createItem({ title: 'New Item', price: 100 });
+// WRONG - args as object literal (will cause errors)
+// const menuItemsQuery = useQuery(api.menu.list, {});
+```
+
+### Accessing Query Data
+
+```typescript
+// Query returns an object with isLoading, error, and data properties
+const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+
+// Access data via properties (not store syntax)
+const loading = $derived(menuItemsQuery.isLoading);
+const items = $derived(menuItemsQuery.data ?? []);
+
+// WRONG - do not use store syntax
+// const items = $menuItemsQuery;
+```
+
+### Mutations - Use useConvexClient
+
+```typescript
+import { useConvexClient } from 'convex-svelte';
+import { api } from '$convex/_generated/api';
+
+// Get the Convex client
+const client = useConvexClient();
+
+// Call mutations via client.mutation()
+async function createItem() {
+  await client.mutation(api.menu.create, {
+    title: 'New Item',
+    price: 100,
+    category: 'dumplings'
+  });
+}
+
+async function updateItem(id: string) {
+  await client.mutation(api.menu.update, {
+    id,
+    title: 'Updated Title'
+  });
+}
+```
+
+### Complete Example
+
+```svelte
+<script lang="ts">
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
+
+  // Client for mutations
+  const client = useConvexClient();
+
+  // Queries with arrow function args
+  const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+  const categoriesQuery = useQuery(api.categories.list, () => ({}));
+
+  // Derived state from queries
+  const loading = $derived(menuItemsQuery.isLoading || categoriesQuery.isLoading);
+  const menuItems = $derived(menuItemsQuery.data ?? []);
+  const categories = $derived(categoriesQuery.data ?? []);
+
+  // Mutation handlers
+  async function handleCreate() {
+    await client.mutation(api.menu.create, {
+      title: newTitle,
+      price: newPrice,
+      category: selectedCategory
+    });
+  }
+
+  async function handleDelete(id: string) {
+    await client.mutation(api.menu.remove, { id });
+  }
+</script>
+
+{#if loading}
+  <p>Loading...</p>
+{:else}
+  {#each menuItems as item}
+    <div>{item.title} - {item.price} Kč</div>
+  {/each}
+{/if}
 ```
 
 ---
@@ -130,21 +223,35 @@ await createItem({ title: 'New Item', price: 100 });
 ### Running Convex
 ```bash
 # Development (watches for changes)
-npx convex dev
+bunx convex dev
 
 # Deploy to production
-npx convex deploy
+bunx convex deploy --prod
 ```
 
 ### File Storage
 ```typescript
 // Upload a file
-const generateUploadUrl = useMutation(api.media.generateUploadUrl);
-const saveFile = useMutation(api.media.saveFile);
+const client = useConvexClient();
 
-const url = await generateUploadUrl({});
-await fetch(url, { method: 'POST', body: file });
-await saveFile({ storageId, filename, contentType, size });
+// Get upload URL
+const uploadUrl = await client.mutation(api.media.generateUploadUrl, {});
+
+// Upload to storage
+const response = await fetch(uploadUrl, {
+  method: 'POST',
+  headers: { 'Content-Type': file.type },
+  body: file,
+});
+
+const { storageId } = await response.json();
+
+// Save file record
+await client.mutation(api.media.create, {
+  storageId,
+  filename: file.name,
+  contentType: file.type,
+});
 ```
 
 ---
@@ -484,20 +591,40 @@ api.reservations.updateStatus({
 ## Deployment
 
 ### Vercel (SvelteKit)
+
+The project is configured for Vercel deployment with `vercel.json`:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "sveltekit",
+  "env": {
+    "PUBLIC_CONVEX_URL": "https://jovial-perch-285.convex.cloud"
+  }
+}
+```
+
 ```bash
 cd fulala-public
-vercel
+vercel --prod
 ```
 
 ### Environment Variables
+
+**Local Development** (`.env.local`):
 ```bash
-# .env.local
-PUBLIC_CONVEX_URL=https://your-project.convex.cloud
+PUBLIC_CONVEX_URL=https://determined-ram-534.convex.cloud
+```
+
+**Vercel Production** (set via CLI or dashboard):
+```bash
+vercel env add PUBLIC_CONVEX_URL production
+# Enter: https://jovial-perch-285.convex.cloud
 ```
 
 ### Convex Production
 ```bash
-npx convex deploy --prod
+bunx convex deploy --prod
 ```
 
 ---
@@ -507,20 +634,16 @@ npx convex deploy --prod
 ```bash
 # Start development
 cd fulala-public
-npm run dev          # SvelteKit server (port 5173)
-npx convex dev       # Convex dev server (separate terminal)
+bun run dev          # SvelteKit server (port 5173)
+bunx convex dev      # Convex dev server (separate terminal)
 
 # Testing
-npm run test:e2e     # Run Playwright tests
-npm run test:e2e:ui  # Run with Playwright UI
+bun run test:e2e     # Run Playwright tests
+bun run test:e2e:ui  # Run with Playwright UI
 
 # Building
-npm run build        # Build for production
-npm run preview      # Preview production build
-
-# Linting
-npm run lint         # Check linting
-npm run format       # Format code
+bun run build        # Build for production
+bun run preview      # Preview production build
 ```
 
 ---
@@ -530,7 +653,7 @@ npm run format       # Format code
 ### Common Issues
 
 **"Convex client not connected"**
-- Ensure `npx convex dev` is running
+- Ensure `bunx convex dev` is running
 - Check `PUBLIC_CONVEX_URL` environment variable
 
 **"Session expired" on admin pages**
@@ -538,8 +661,12 @@ npm run format       # Format code
 - Check if Convex is running
 
 **"Module not found" errors**
-- Run `npm install` to ensure dependencies are installed
+- Run `bun install` to ensure dependencies are installed
 - Check that you're in the `fulala-public` directory
+
+**Build fails with "PUBLIC_CONVEX_URL is not exported"**
+- Set the environment variable in Vercel dashboard
+- Run `vercel env add PUBLIC_CONVEX_URL production`
 
 ### Support
 - GitHub Issues: [Link to repo]

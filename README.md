@@ -1,6 +1,8 @@
-# Fulala Site Builder v2 🐯
+# Fulala Site Builder v2
 
 A comprehensive restaurant platform for Fulala featuring real-time ordering, table management, reservations, and an admin dashboard - all built with SvelteKit and Convex.
+
+**Live Site:** https://fulala-public.vercel.app
 
 ## Quick Start
 
@@ -30,8 +32,9 @@ bun run dev:convex   # Terminal 2: Convex
 **URLs:**
 | Service | URL |
 |---------|-----|
-| Public Site | http://localhost:5173 |
+| Public Site (Local) | http://localhost:5173 |
 | Admin Dashboard | http://localhost:5173/admin |
+| Production Site | https://fulala-public.vercel.app |
 | Convex Dashboard | https://dashboard.convex.dev |
 
 **Admin Login:** `admin@fulala.cz` / `admin123`
@@ -128,18 +131,49 @@ fulala/
 - **Database**: Convex (real-time)
 - **Authentication**: Session-based with HttpOnly cookies
 - **Components**: bits-ui headless components
+- **Deployment**: Vercel (frontend) + Convex Cloud (backend)
 
 ## Brand Guidelines
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| Fulala Red | #FB3000 | Primary, CTAs |
+| Fulala Red | #EF4136 | Primary, CTAs |
 | Tiger Orange | #FCEBDC | Backgrounds, borders |
-| Dough White | #FF8A14 | Page background |
+| Dough White | #FFFFFF | Page background |
 | Soy Brown | #6B3900 | Text, secondary |
 | Ink Black | #000000 | Headlines |
 
 **Typography**: Chewy (headings), Outfit (body)
+
+## Deployment
+
+### Vercel (Automatic)
+The site is configured for automatic deployment via Vercel:
+
+```bash
+# Manual deploy from fulala-public directory
+cd fulala-public
+vercel --prod
+```
+
+### Environment Variables
+
+**Local Development** (`.env.local`):
+```bash
+PUBLIC_CONVEX_URL=https://determined-ram-534.convex.cloud
+```
+
+**Vercel Production**:
+- `PUBLIC_CONVEX_URL` = `https://jovial-perch-285.convex.cloud`
+
+### Convex Deployment
+
+```bash
+cd fulala-public
+
+# Deploy to production
+bunx convex deploy --prod
+```
 
 ## Testing
 
@@ -147,17 +181,10 @@ fulala/
 cd fulala-public
 
 # Run E2E tests
-npm run test:e2e
+bun run test:e2e
 
 # Run with UI
-npm run test:e2e:ui
-```
-
-## Deployment
-
-```bash
-# Deploy to Vercel
-cd fulala-public && vercel
+bun run test:e2e:ui
 ```
 
 ## Archive: Legacy Code
@@ -167,13 +194,6 @@ The `archive/` directory contains the original implementations:
 - **archive/nextjs/** - Original Next.js app
 - **archive/phoenix/** - Phoenix LiveView admin dashboard
 
-To run the legacy Next.js app:
-```bash
-cd archive/nextjs
-npm install
-npm run dev
-```
-
 ---
 
-🐯 Built with love and dumplings.
+Built with love and dumplings.

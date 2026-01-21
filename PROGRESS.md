@@ -3,6 +3,8 @@
 ## Overview
 This document tracks the implementation progress of Fulala Site Builder v2, a comprehensive restaurant platform built with SvelteKit and Convex.
 
+**Live Site:** https://fulala-public.vercel.app
+
 ---
 
 ## Implementation Status
@@ -157,6 +159,28 @@ This document tracks the implementation progress of Fulala Site Builder v2, a co
 
 ---
 
+### Phase 6: Deployment ✅ COMPLETE
+
+#### 6.1 Convex Production ✅
+- [x] Deploy Convex to production (`jovial-perch-285.convex.cloud`)
+- [x] Fix TypeScript errors in Convex functions
+- [x] Configure production environment
+
+#### 6.2 Vercel Deployment ✅
+- [x] Configure `vercel.json` for SvelteKit
+- [x] Set up `PUBLIC_CONVEX_URL` environment variable
+- [x] Fix convex-svelte API patterns in all files
+- [x] Fix import paths to use `$convex` alias
+- [x] Configure a11y warning suppression
+- [x] Deploy to production: https://fulala-public.vercel.app
+
+#### 6.3 Documentation ✅
+- [x] Update README.md with deployment info
+- [x] Update DOCUMENTATION.md with correct convex-svelte patterns
+- [x] Update PROGRESS.md with deployment status
+
+---
+
 ### Repository Organization ✅ COMPLETE
 
 - [x] SvelteKit is the default (fulala-public/)
@@ -177,6 +201,9 @@ This document tracks the implementation progress of Fulala Site Builder v2, a co
 | `feat: add public features (gallery, reservations, QR ordering, map)` | 4 public routes + map component |
 | `feat: integrate live Convex data and complete public site` | Live data + all public pages |
 | `docs: update README and add project configuration` | README v2 + config files |
+| `fix: convex-svelte API patterns and TypeScript errors` | Fix useQuery/useMutation patterns |
+| `feat: deploy to Vercel production` | Vercel config + deployment |
+| `docs: update documentation with deployment info` | Final docs update |
 
 ---
 
@@ -188,6 +215,7 @@ This document tracks the implementation progress of Fulala Site Builder v2, a co
 - [ ] Add toast notifications
 - [ ] Add loading states for all mutations
 - [ ] Improve mobile responsiveness in admin
+- [ ] Fix a11y warnings (add aria-labels to buttons)
 
 ### v2.2 - Features
 - [ ] Kitchen display system (KDS)
@@ -207,6 +235,11 @@ This document tracks the implementation progress of Fulala Site Builder v2, a co
 - [ ] Revenue reports
 - [ ] Reservation analytics
 
+### v2.5 - Branding
+- [ ] Update brand colors to match logo (#EF4136)
+- [ ] Add logo assets to static folder
+- [ ] Display logo in navigation
+
 ---
 
 ## Technical Debt
@@ -219,17 +252,34 @@ This document tracks the implementation progress of Fulala Site Builder v2, a co
 
 ---
 
+## Deployment Info
+
+### URLs
+| Environment | URL |
+|-------------|-----|
+| Production Site | https://fulala-public.vercel.app |
+| Production Convex | https://jovial-perch-285.convex.cloud |
+| Dev Convex | https://determined-ram-534.convex.cloud |
+| Convex Dashboard | https://dashboard.convex.dev |
+
+### Environment Variables
+| Variable | Dev Value | Prod Value |
+|----------|-----------|------------|
+| `PUBLIC_CONVEX_URL` | determined-ram-534.convex.cloud | jovial-perch-285.convex.cloud |
+
+---
+
 ## Notes
 
 ### Development Commands
 ```bash
 cd fulala-public
-npm run dev          # Start SvelteKit
-npx convex dev       # Start Convex (separate terminal)
+bun run dev          # Start SvelteKit
+bunx convex dev      # Start Convex (separate terminal)
 ```
 
 ### Admin Access
-- URL: http://localhost:5173/admin
+- URL: http://localhost:5173/admin (dev) or https://fulala-public.vercel.app/admin (prod)
 - Email: admin@fulala.cz
 - Password: admin123
 
@@ -237,7 +287,9 @@ npx convex dev       # Start Convex (separate terminal)
 - Schema: `fulala-public/convex/schema.ts`
 - Admin Auth: `fulala-public/src/routes/admin/+layout.server.ts`
 - UI Components: `fulala-public/src/lib/components/ui/`
+- Vercel Config: `fulala-public/vercel.json`
+- Svelte Config: `fulala-public/svelte.config.js`
 
 ---
 
-*Last Updated: January 2026*
+*Last Updated: January 21, 2026*
