@@ -7,13 +7,12 @@ export const list = query({
     activeOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("floorPlans");
-
-    if (args.activeOnly) {
-      query = query.withIndex("by_active", (q) => q.eq("isActive", true));
-    }
-
-    const floorPlans = await query.collect();
+    const floorPlans = args.activeOnly
+      ? await ctx.db
+          .query("floorPlans")
+          .withIndex("by_active", (q) => q.eq("isActive", true))
+          .collect()
+      : await ctx.db.query("floorPlans").collect();
 
     // Get table counts for each floor
     const enriched = await Promise.all(

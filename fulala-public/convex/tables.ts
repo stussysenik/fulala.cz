@@ -16,17 +16,24 @@ export const list = query({
     activeOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("tables");
-
     if (args.floorId) {
-      query = query.withIndex("by_floor", (q) => q.eq("floorId", args.floorId!));
+      return await ctx.db
+        .query("tables")
+        .withIndex("by_floor", (q) => q.eq("floorId", args.floorId!))
+        .collect();
     } else if (args.status) {
-      query = query.withIndex("by_status", (q) => q.eq("status", args.status!));
+      return await ctx.db
+        .query("tables")
+        .withIndex("by_status", (q) => q.eq("status", args.status!))
+        .collect();
     } else if (args.activeOnly) {
-      query = query.withIndex("by_active", (q) => q.eq("isActive", true));
+      return await ctx.db
+        .query("tables")
+        .withIndex("by_active", (q) => q.eq("isActive", true))
+        .collect();
     }
 
-    return await query.collect();
+    return await ctx.db.query("tables").collect();
   },
 });
 

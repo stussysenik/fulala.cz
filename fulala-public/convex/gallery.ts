@@ -9,19 +9,24 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("galleryItems");
+    let items;
 
     if (args.featuredOnly) {
-      query = query.withIndex("by_featured", (q) => q.eq("isFeatured", true));
+      items = await ctx.db
+        .query("galleryItems")
+        .withIndex("by_featured", (q) => q.eq("isFeatured", true))
+        .collect();
     } else if (args.category) {
-      query = query.withIndex("by_category", (q) =>
-        q.eq("category", args.category!)
-      );
+      items = await ctx.db
+        .query("galleryItems")
+        .withIndex("by_category", (q) => q.eq("category", args.category!))
+        .collect();
     } else {
-      query = query.withIndex("by_sort");
+      items = await ctx.db
+        .query("galleryItems")
+        .withIndex("by_sort")
+        .collect();
     }
-
-    let items = await query.collect();
 
     // Enrich with media data
     const enrichedItems = await Promise.all(

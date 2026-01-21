@@ -29,19 +29,28 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("orders");
+    let orders;
 
     if (args.status) {
-      query = query.withIndex("by_status", (q) => q.eq("status", args.status!));
+      orders = await ctx.db
+        .query("orders")
+        .withIndex("by_status", (q) => q.eq("status", args.status!))
+        .order("desc")
+        .collect();
     } else if (args.tableId) {
-      query = query.withIndex("by_table", (q) =>
-        q.eq("tableId", args.tableId!)
-      );
+      orders = await ctx.db
+        .query("orders")
+        .withIndex("by_table", (q) => q.eq("tableId", args.tableId!))
+        .order("desc")
+        .collect();
     } else {
-      query = query.withIndex("by_created");
+      orders = await ctx.db
+        .query("orders")
+        .withIndex("by_created")
+        .order("desc")
+        .collect();
     }
 
-    const orders = await query.order("desc").collect();
     return args.limit ? orders.slice(0, args.limit) : orders;
   },
 });

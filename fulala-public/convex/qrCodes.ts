@@ -21,15 +21,14 @@ export const list = query({
     activeOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("qrCodes");
-
-    if (args.type) {
-      query = query.withIndex("by_type", (q) =>
-        q.eq("type", args.type!).eq("isActive", args.activeOnly ?? true)
-      );
-    }
-
-    const codes = await query.collect();
+    const codes = args.type
+      ? await ctx.db
+          .query("qrCodes")
+          .withIndex("by_type", (q) =>
+            q.eq("type", args.type!).eq("isActive", args.activeOnly ?? true)
+          )
+          .collect()
+      : await ctx.db.query("qrCodes").collect();
 
     // Enrich with table data for table_order codes
     const enrichedCodes = await Promise.all(

@@ -18,17 +18,24 @@ export const list = query({
     tableId: v.optional(v.id("tables")),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("reservations");
-
     if (args.date) {
-      query = query.withIndex("by_date", (q) => q.eq("date", args.date!));
+      return await ctx.db
+        .query("reservations")
+        .withIndex("by_date", (q) => q.eq("date", args.date!))
+        .collect();
     } else if (args.status) {
-      query = query.withIndex("by_status", (q) => q.eq("status", args.status!));
+      return await ctx.db
+        .query("reservations")
+        .withIndex("by_status", (q) => q.eq("status", args.status!))
+        .collect();
     } else if (args.tableId) {
-      query = query.withIndex("by_table", (q) => q.eq("tableId", args.tableId!));
+      return await ctx.db
+        .query("reservations")
+        .withIndex("by_table", (q) => q.eq("tableId", args.tableId!))
+        .collect();
     }
 
-    return await query.collect();
+    return await ctx.db.query("reservations").collect();
   },
 });
 
