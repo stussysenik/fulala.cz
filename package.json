@@ -1,0 +1,20 @@
+{
+  "name": "fulala",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Fulala Restaurant Platform - SvelteKit + Convex",
+  "scripts": {
+    "dev": "cd fulala-public && bun run dev",
+    "dev:convex": "cd fulala-public && bunx convex dev",
+    "dev:all": "concurrently \"bun run dev\" \"bun run dev:convex\"",
+    "build": "cd fulala-public && bun run build",
+    "preview": "cd fulala-public && bun run preview",
+    "test": "cd fulala-public && bun run test:e2e",
+    "lint": "cd fulala-public && bun run lint",
+    "install:app": "cd fulala-public && bun install",
+    "setup": "bun run install:app && cd fulala-public && bunx convex dev --once"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
