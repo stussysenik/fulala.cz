@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title suffix=" · Fulala Admin">
+      <%= assigns[:page_title] || "Dashboard" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Chewy&family=Outfit:wght@400;500;600&display=swap');
+
+      :root {
+        --color-fulala-red: #FB3000;
+        --color-tiger-orange: #FCEBDC;
+        --color-dough-white: #FF8A14;
+        --color-soy-brown: #6B3900;
+        --color-ink-black: #000000;
+      }
+
+      .font-heading { font-family: 'Chewy', cursive; }
+      .font-body { font-family: 'Outfit', sans-serif; }
+      .text-fulala-red { color: var(--color-fulala-red); }
+      .text-tiger-orange { color: var(--color-tiger-orange); }
+      .text-soy-brown { color: var(--color-soy-brown); }
+      .text-ink-black { color: var(--color-ink-black); }
+      .bg-fulala-red { background-color: var(--color-fulala-red); }
+      .bg-tiger-orange { background-color: var(--color-tiger-orange); }
+      .bg-dough-white { background-color: var(--color-dough-white); }
+      .border-tiger-orange { border-color: var(--color-tiger-orange); }
+      .border-fulala-red { border-color: var(--color-fulala-red); }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        background-color: var(--color-fulala-red);
+        color: white;
+        font-family: 'Outfit', sans-serif;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+      }
+      .btn-primary:hover { transform: scale(1.02); }
+
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border: 2px solid var(--color-soy-brown);
+        color: var(--color-soy-brown);
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+      }
+      .btn-secondary:hover {
+        background-color: var(--color-soy-brown);
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="h-full bg-dough-white font-body">
+    <%= @inner_content %>
+  </body>
+</html>

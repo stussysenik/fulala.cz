@@ -1,0 +1,37 @@
+<div class="min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r-2 border-tiger-orange shadow-sm">
+    <div class="p-6">
+      <a href="/" class="text-3xl font-heading text-fulala-red">
+        Fulala
+      </a>
+      <p class="text-sm text-soy-brown/70">Admin Dashboard</p>
+    </div>
+
+    <nav class="px-4 space-y-1">
+      <.nav_link href="/" icon="🏠" label="Dashboard" />
+      <.nav_link href="/menu" icon="🥟" label="Menu Items" />
+      <.nav_link href="/categories" icon="📂" label="Categories" />
+      <.nav_link href="/media" icon="🖼️" label="Media" />
+      <.nav_link href="/settings" icon="⚙️" label="Settings" />
+
+      <hr class="my-4 border-tiger-orange" />
+
+      <.nav_link href="/preview" icon="👁️" label="Preview Site" />
+    </nav>
+
+    <div class="absolute bottom-0 left-0 w-64 p-4 border-t-2 border-tiger-orange">
+      <p class="text-xs text-soy-brown/50 text-center">
+        Fulala Admin v0.1.0
+      </p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+    <!-- Flash Messages -->
+    <.flash_group flash={@flash} />
+
+    <%= @inner_content %>
+  </main>
+</div>
