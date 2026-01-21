@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # SvelteKit Public Site
+  public:
+    build:
+      context: ./fulala-public
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./fulala-public:/app
+      - /app/node_modules
+    environment:
+      - PUBLIC_CONVEX_URL=${CONVEX_URL}
+    command: npm run dev -- --host 0.0.0.0
+
+  # Phoenix LiveView Admin
+  admin:
+    build:
+      context: ./fulala-admin
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./fulala-admin:/app
+      - /app/_build
+      - /app/deps
+    environment:
+      - CONVEX_URL=${CONVEX_URL}
+      - CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
+      - PUBLIC_SITE_URL=http://localhost:5173
+      - PHX_HOST=localhost
+      - SECRET_KEY_BASE=dev_only_secret_key_base_not_for_production_use
+    command: mix phx.server
+    depends_on:
+      - public
+
+# For future Shopify integration
+#  shopify:
+#    build:
+#      context: ./fulala-shopify
+#      dockerfile: Dockerfile.dev
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+#      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+
+networks:
+  default:
+    name: fulala-network

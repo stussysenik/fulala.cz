@@ -1,40 +1,170 @@
-# EXPERIMENTAL 
+# Fulala Site Builder v2 🐯
 
-```
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A comprehensive restaurant platform for Fulala featuring real-time ordering, table management, reservations, and an admin dashboard - all built with SvelteKit and Convex.
 
-## Getting Started
-
-First, run the development server:
+## Quick Start
 
 ```bash
+# Navigate to the main project
+cd fulala-public
+
+# Install dependencies
+npm install
+
+# Start Convex dev server (new terminal)
+npx convex dev
+
+# Start SvelteKit dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**URLs:**
+| Service | URL |
+|---------|-----|
+| Public Site | http://localhost:5173 |
+| Admin Dashboard | http://localhost:5173/admin |
+| Convex Dashboard | https://dashboard.convex.dev |
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**Admin Login:** `admin@fulala.cz` / `admin123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 ```
+┌──────────────────────────────────────────────────────────────────────┐
+│                      FULALA PLATFORM v2                              │
+├──────────────────────────────────────────────────────────────────────┤
+│  PUBLIC (/)                          ADMIN (/admin)                  │
+│  ┌────────────────────────┐         ┌────────────────────────┐      │
+│  │  Home, Menu, Story     │         │  Dashboard, Orders     │      │
+│  │  Contact, Gallery      │         │  Tables, Reservations  │      │
+│  │  Reservations, QR Order│         │  Floor Plan, QR Codes  │      │
+│  └───────────┬────────────┘         └───────────┬────────────┘      │
+│              └──────────────┬───────────────────┘                    │
+│                             │                                        │
+│              ┌──────────────┴──────────────┐                        │
+│              │         CONVEX              │                        │
+│              │   Real-time Database        │                        │
+│              │   + File Storage            │                        │
+│              └─────────────────────────────┘                        │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+## Project Structure
+
+```
+fulala/
+├── fulala-public/           # Main SvelteKit app (public + admin)
+│   ├── src/
+│   │   ├── routes/          # All pages
+│   │   │   ├── admin/       # Admin dashboard
+│   │   │   ├── gallery/     # Photo gallery
+│   │   │   ├── reservations/# Public booking
+│   │   │   ├── order/[tableCode]/ # QR ordering
+│   │   │   └── ...
+│   │   ├── lib/components/  # Shared components
+│   │   │   ├── ui/          # Button, Input, Card, etc.
+│   │   │   ├── admin/       # Admin-specific components
+│   │   │   ├── grid/        # Layout grid system
+│   │   │   └── map/         # Location map
+│   │   └── app.css          # Tailwind v4 styles
+│   ├── convex/              # Real-time backend
+│   │   ├── schema.ts        # Database schema
+│   │   ├── menu.ts          # Menu CRUD
+│   │   ├── orders.ts        # Order management
+│   │   ├── tables.ts        # Table management
+│   │   ├── reservations.ts  # Booking system
+│   │   ├── qrCodes.ts       # QR code handling
+│   │   ├── gallery.ts       # Gallery items
+│   │   ├── floorPlans.ts    # Floor plan data
+│   │   └── auth.ts          # Admin authentication
+│   └── tests/e2e/           # Playwright tests
+├── archive/                 # Legacy code (preserved)
+│   ├── nextjs/              # Original Next.js app
+│   └── phoenix/             # Phoenix LiveView admin
+├── scripts/setup.sh         # Setup script
+└── docker-compose.yml       # Docker dev setup
+```
+
+## Features
+
+### Public Site
+- **Menu** - Real-time menu with category filtering
+- **Gallery** - Masonry photo gallery with lightbox
+- **Reservations** - Online table booking
+- **QR Ordering** - Scan QR code at table to order
+- **Contact** - Map with directions
+
+### Admin Dashboard
+- **Dashboard** - Overview metrics
+- **Menu Management** - CRUD with image upload
+- **Category Management** - Organize menu items
+- **Orders** - Real-time order tracking with status workflow
+- **Tables** - Table capacity and status management
+- **Floor Plan** - Visual drag-drop table editor
+- **Reservations** - Manage bookings
+- **QR Codes** - Generate and manage table QR codes
+- **Gallery** - Manage photo gallery
+- **Media Library** - File upload and management
+
+### Real-time Features
+- Live order updates
+- Instant menu changes
+- Real-time table status
+- Collaborative floor plan editing
+
+## Tech Stack
+
+- **Frontend**: SvelteKit 2.49 + Svelte 5 (runes)
+- **Styling**: Tailwind CSS v4
+- **Database**: Convex (real-time)
+- **Authentication**: Session-based with HttpOnly cookies
+- **Components**: bits-ui headless components
+
+## Brand Guidelines
+
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Fulala Red | #FB3000 | Primary, CTAs |
+| Tiger Orange | #FCEBDC | Backgrounds, borders |
+| Dough White | #FF8A14 | Page background |
+| Soy Brown | #6B3900 | Text, secondary |
+| Ink Black | #000000 | Headlines |
+
+**Typography**: Chewy (headings), Outfit (body)
+
+## Testing
+
+```bash
+cd fulala-public
+
+# Run E2E tests
+npm run test:e2e
+
+# Run with UI
+npm run test:e2e:ui
+```
+
+## Deployment
+
+```bash
+# Deploy to Vercel
+cd fulala-public && vercel
+```
+
+## Archive: Legacy Code
+
+The `archive/` directory contains the original implementations:
+
+- **archive/nextjs/** - Original Next.js app
+- **archive/phoenix/** - Phoenix LiveView admin dashboard
+
+To run the legacy Next.js app:
+```bash
+cd archive/nextjs
+npm install
+npm run dev
+```
+
+---
+
+🐯 Built with love and dumplings.
