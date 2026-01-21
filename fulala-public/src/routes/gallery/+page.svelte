@@ -1,21 +1,26 @@
 <script lang="ts">
-  import { useQuery } from 'convex/svelte';
-  import { api } from '../../../convex/_generated/api';
+  import { useQuery } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { fade, scale } from 'svelte/transition';
 
-  // Queries
-  const galleryItems = useQuery(api.gallery.list, {});
-  const categories = useQuery(api.gallery.getCategories, {});
+  // Queries - convex-svelte returns {isLoading, error, data}
+  const galleryItemsQuery = useQuery(api.gallery.list, () => ({}));
+  const categoriesQuery = useQuery(api.gallery.getCategories, () => ({}));
+
+  // Derived data
+  const galleryItems = $derived(galleryItemsQuery.data);
+  const categories = $derived(categoriesQuery.data);
 
   // State
   let activeCategory = $state('all');
-  let lightboxItem = $state<typeof $galleryItems extends (infer T)[] | undefined ? T : never | null>(null);
+  type GalleryItem = NonNullable<typeof galleryItems>[number];
+  let lightboxItem = $state<GalleryItem | null>(null);
   let lightboxIndex = $state(0);
 
   const filteredItems = $derived(() => {
-    if (!$galleryItems) return [];
-    if (activeCategory === 'all') return $galleryItems;
-    return $galleryItems.filter((item) => item.category === activeCategory);
+    if (!galleryItems) return [];
+    if (activeCategory === 'all') return galleryItems;
+    return galleryItems.filter((item) => item.category === activeCategory);
   });
 
   function openLightbox(item: NonNullable<typeof lightboxItem>, index: number) {

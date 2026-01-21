@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { Button, Input, Select, Card } from '$lib/components/ui';
+
+  // Convex client for mutations
+  const client = useConvexClient();
 
   // Get available slots
   let selectedDate = $state(new Date().toISOString().split('T')[0]);
   let selectedTime = $state('');
   let partySize = $state(2);
 
-  const availableSlots = useQuery(api.reservations.getAvailableSlots, {
+  const availableSlotsQuery = useQuery(api.reservations.getAvailableSlots, () => ({
     date: selectedDate,
     partySize,
-  });
-  const createReservation = useMutation(api.reservations.create);
+  }));
 
   // Form state
   let formData = $state({
@@ -28,8 +30,9 @@
   let confirmationDetails = $state<{ guestName: string; date: string; time: string; partySize: number } | null>(null);
 
   const timeOptions = $derived(() => {
-    if (!$availableSlots) return [];
-    return $availableSlots
+    const slots = availableSlotsQuery.data;
+    if (!slots) return [];
+    return slots
       .filter((slot) => slot.available)
       .map((slot) => ({
         value: slot.time,
@@ -49,7 +52,7 @@
     submitting = true;
 
     try {
-      await createReservation({
+      await client.mutation(api.reservations.create, {
         guestName: formData.guestName,
         phone: formData.phone,
         email: formData.email || undefined,
@@ -181,7 +184,7 @@
           <!-- Time Slots -->
           <div>
             <label class="mb-1.5 block text-sm font-medium text-soy-brown">Time</label>
-            {#if $availableSlots === undefined}
+            {#if availableSlotsQuery.data === undefined}
               <div class="animate-pulse h-10 rounded-lg bg-neutral-200"></div>
             {:else if timeOptions().length === 0}
               <p class="rounded-lg bg-yellow-50 p-3 text-sm text-yellow-800">
@@ -189,7 +192,7 @@
               </p>
             {:else}
               <div class="grid grid-cols-4 gap-2 sm:grid-cols-6">
-                {#each $availableSlots as slot}
+                {#each availableSlotsQuery.data as slot}
                   <button
                     type="button"
                     class="rounded-lg border px-3 py-2 text-sm transition-colors {selectedTime === slot.time

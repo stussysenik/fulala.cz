@@ -1,24 +1,22 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Input, Select, Card, Badge, Dialog, DataTable } from '$lib/components/ui';
   import type { Id } from '../../../../convex/_generated/dataModel';
 
-  // Queries
-  const menuItems = useQuery(api.menu.list, {});
-  const categories = useQuery(api.categories.list, {});
+  // Convex client for mutations
+  const client = useConvexClient();
 
-  // Mutations
-  const createMenuItem = useMutation(api.menu.create);
-  const updateMenuItem = useMutation(api.menu.update);
-  const deleteMenuItem = useMutation(api.menu.remove);
+  // Queries
+  const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+  const categoriesQuery = useQuery(api.categories.list, () => ({}));
 
   // State
   let showCreateDialog = $state(false);
   let showEditDialog = $state(false);
   let showDeleteDialog = $state(false);
-  let selectedItem = $state<typeof $menuItems extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedItem = $state<NonNullable<typeof menuItemsQuery.data>[number] | null>(null);
   let searchQuery = $state('');
   let categoryFilter = $state('all');
 
@@ -34,8 +32,9 @@
 
   // Filter menu items
   const filteredItems = $derived(() => {
-    if (!$menuItems) return [];
-    return $menuItems.filter((item) => {
+    const menuItems = menuItemsQuery.data;
+    if (!menuItems) return [];
+    return menuItems.filter((item) => {
       const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
@@ -45,23 +44,26 @@
 
   // Category options for select
   const categoryOptions = $derived(() => {
+    const categories = categoriesQuery.data;
     const base = [{ value: 'all', label: 'All Categories' }];
-    if (!$categories) return base;
-    return [...base, ...$categories.map((c) => ({ value: c.slug, label: c.name }))];
+    if (!categories) return base;
+    return [...base, ...categories.map((c) => ({ value: c.slug, label: c.name }))];
   });
 
   const categoryOptionsForForm = $derived(() => {
-    if (!$categories) return [];
-    return $categories.map((c) => ({ value: c.slug, label: c.name }));
+    const categories = categoriesQuery.data;
+    if (!categories) return [];
+    return categories.map((c) => ({ value: c.slug, label: c.name }));
   });
 
   function openCreateDialog() {
+    const categories = categoriesQuery.data;
     formData = {
       title: '',
       description: '',
       price: 0,
       priceDisplay: '',
-      category: $categories?.[0]?.slug || '',
+      category: categories?.[0]?.slug || '',
       isAvailable: true,
     };
     showCreateDialog = true;
@@ -86,7 +88,7 @@
   }
 
   async function handleCreate() {
-    await createMenuItem({
+    await client.mutation(api.menu.create, {
       title: formData.title,
       description: formData.description,
       price: formData.price,
@@ -99,7 +101,7 @@
 
   async function handleUpdate() {
     if (!selectedItem) return;
-    await updateMenuItem({
+    await client.mutation(api.menu.update, {
       id: selectedItem._id,
       title: formData.title,
       description: formData.description,
@@ -114,7 +116,7 @@
 
   async function handleDelete() {
     if (!selectedItem) return;
-    await deleteMenuItem({ id: selectedItem._id });
+    await client.mutation(api.menu.remove, { id: selectedItem._id });
     showDeleteDialog = false;
     selectedItem = null;
   }
@@ -176,7 +178,7 @@
 <DataTable
   data={filteredItems()}
   {columns}
-  loading={$menuItems === undefined}
+  loading={menuItemsQuery.data === undefined}
   emptyMessage="No menu items found"
   hoverable
   onRowClick={(item) => openEditDialog(item)}

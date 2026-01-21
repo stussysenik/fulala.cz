@@ -1,21 +1,20 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Dialog, Input } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const mediaItems = useQuery(api.media.list, {});
-  const generateUploadUrl = useMutation(api.media.generateUploadUrl);
-  const createMedia = useMutation(api.media.create);
-  const updateMedia = useMutation(api.media.update);
-  const deleteMedia = useMutation(api.media.remove);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const mediaItemsQuery = useQuery(api.media.list, () => ({}));
 
   // State
   let uploading = $state(false);
   let uploadProgress = $state(0);
   let showEditDialog = $state(false);
-  let selectedMedia = $state<typeof $mediaItems extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedMedia = $state<NonNullable<typeof mediaItemsQuery.data>[number] | null>(null);
   let editAlt = $state('');
   let dragOver = $state(false);
 
@@ -30,7 +29,7 @@
         const file = files[i];
 
         // Get upload URL
-        const uploadUrl = await generateUploadUrl();
+        const uploadUrl = await client.mutation(api.media.generateUploadUrl, {});
 
         // Upload file
         const response = await fetch(uploadUrl, {
@@ -42,7 +41,7 @@
         const { storageId } = await response.json();
 
         // Create media record
-        await createMedia({
+        await client.mutation(api.media.create, {
           storageId,
           filename: file.name,
           contentType: file.type,
@@ -81,7 +80,7 @@
 
   async function handleUpdate() {
     if (!selectedMedia) return;
-    await updateMedia({
+    await client.mutation(api.media.update, {
       id: selectedMedia._id,
       alt: editAlt || undefined,
     });
@@ -91,7 +90,7 @@
 
   async function handleDelete(media: NonNullable<typeof selectedMedia>) {
     if (confirm('Delete this media file? This cannot be undone.')) {
-      await deleteMedia({ id: media._id });
+      await client.mutation(api.media.remove, { id: media._id });
     }
   }
 
@@ -178,18 +177,18 @@
 
 <!-- Media Grid -->
 <div class="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-  {#if $mediaItems === undefined}
+  {#if mediaItemsQuery.data === undefined}
     {#each Array(12) as _}
       <div class="aspect-square animate-pulse rounded-lg bg-neutral-200"></div>
     {/each}
-  {:else if $mediaItems.length === 0}
+  {:else if mediaItemsQuery.data.length === 0}
     <div class="col-span-full">
       <Card class="py-12 text-center">
         <p class="text-neutral-500">No media files yet. Upload some images to get started.</p>
       </Card>
     </div>
   {:else}
-    {#each $mediaItems as media}
+    {#each mediaItemsQuery.data as media}
       <div class="group relative overflow-hidden rounded-lg bg-neutral-100">
         {#if media.url}
           <img

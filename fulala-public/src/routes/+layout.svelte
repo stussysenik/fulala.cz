@@ -2,9 +2,14 @@
   import '../app.css';
   import { page } from '$app/stores';
   import { fade } from 'svelte/transition';
+  import { setupConvex } from 'convex-svelte';
+  import { PUBLIC_CONVEX_URL } from '$env/static/public';
   import Navigation from '$lib/components/Navigation.svelte';
   import IdleHelper from '$lib/components/IdleHelper.svelte';
   import { onMount } from 'svelte';
+
+  // Setup Convex client
+  setupConvex(PUBLIC_CONVEX_URL);
 
   let { children } = $props();
   let mounted = $state(false);

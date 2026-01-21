@@ -1,24 +1,23 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge, Dialog, Input, Select, Tabs } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const galleryItems = useQuery(api.gallery.list, {});
-  const galleryCategories = useQuery(api.gallery.getCategories, {});
-  const stats = useQuery(api.gallery.getStats, {});
-  const media = useQuery(api.media.list, {});
-  const toggleFeatured = useMutation(api.gallery.toggleFeatured);
-  const updateGalleryItem = useMutation(api.gallery.update);
-  const deleteGalleryItem = useMutation(api.gallery.remove);
-  const createGalleryItem = useMutation(api.gallery.create);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const galleryItemsQuery = useQuery(api.gallery.list, () => ({}));
+  const galleryCategoriesQuery = useQuery(api.gallery.getCategories, () => ({}));
+  const statsQuery = useQuery(api.gallery.getStats, () => ({}));
+  const mediaQuery = useQuery(api.media.list, () => ({}));
 
   // State
   let activeCategory = $state('all');
   let showAddDialog = $state(false);
   let showEditDialog = $state(false);
-  let selectedItem = $state<typeof $galleryItems extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedItem = $state<NonNullable<typeof galleryItemsQuery.data>[number] | null>(null);
   let selectedMediaId = $state<string>('');
   let newCategory = $state('food');
   let newTitle = $state('');
@@ -31,32 +30,34 @@
   ];
 
   const filteredItems = $derived(() => {
-    if (!$galleryItems) return [];
-    if (activeCategory === 'all') return $galleryItems;
-    return $galleryItems.filter((item) => item.category === activeCategory);
+    const items = galleryItemsQuery.data;
+    if (!items) return [];
+    if (activeCategory === 'all') return items;
+    return items.filter((item) => item.category === activeCategory);
   });
 
   const tabs = $derived(() => {
-    const base = [{ id: 'all', label: 'All', badge: $galleryItems?.length }];
-    if ($galleryCategories) {
-      return [...base, ...$galleryCategories.map((c) => ({ id: c.name, label: c.name, badge: c.count }))];
+    const base = [{ id: 'all', label: 'All', badge: galleryItemsQuery.data?.length }];
+    const categories = galleryCategoriesQuery.data;
+    if (categories) {
+      return [...base, ...categories.map((c) => ({ id: c.name, label: c.name, badge: c.count }))];
     }
     return base;
   });
 
   async function handleToggleFeatured(item: NonNullable<typeof selectedItem>) {
-    await toggleFeatured({ id: item._id });
+    await client.mutation(api.gallery.toggleFeatured, { id: item._id });
   }
 
   async function handleDelete(item: NonNullable<typeof selectedItem>) {
     if (confirm('Remove this item from the gallery?')) {
-      await deleteGalleryItem({ id: item._id });
+      await client.mutation(api.gallery.remove, { id: item._id });
     }
   }
 
   async function handleAdd() {
     if (!selectedMediaId) return;
-    await createGalleryItem({
+    await client.mutation(api.gallery.create, {
       mediaId: selectedMediaId as any,
       category: newCategory,
       title: newTitle || undefined,
@@ -75,7 +76,7 @@
 
   async function handleUpdate() {
     if (!selectedItem) return;
-    await updateGalleryItem({
+    await client.mutation(api.gallery.update, {
       id: selectedItem._id,
       category: newCategory,
       title: newTitle || undefined,
@@ -110,15 +111,15 @@
 <!-- Stats -->
 <div class="mb-6 grid gap-4 sm:grid-cols-3">
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$stats?.total ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{statsQuery.data?.total ?? 0}</p>
     <p class="text-sm text-neutral-500">Total Items</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-yellow-600">{$stats?.featured ?? 0}</p>
+    <p class="text-2xl font-bold text-yellow-600">{statsQuery.data?.featured ?? 0}</p>
     <p class="text-sm text-neutral-500">Featured</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{Object.keys($stats?.byCategory ?? {}).length}</p>
+    <p class="text-2xl font-bold text-neutral-900">{Object.keys(statsQuery.data?.byCategory ?? {}).length}</p>
     <p class="text-sm text-neutral-500">Categories</p>
   </Card>
 </div>
@@ -132,7 +133,7 @@
 
 <!-- Gallery Grid -->
 <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-  {#if $galleryItems === undefined}
+  {#if galleryItemsQuery.data === undefined}
     {#each Array(8) as _}
       <div class="aspect-square animate-pulse rounded-lg bg-neutral-200"></div>
     {/each}
@@ -216,8 +217,8 @@
     <div>
       <label class="mb-1.5 block text-sm font-medium text-neutral-700">Select Media</label>
       <div class="grid max-h-60 gap-2 overflow-y-auto sm:grid-cols-4">
-        {#if $media}
-          {#each $media as mediaItem}
+        {#if mediaQuery.data}
+          {#each mediaQuery.data as mediaItem}
             <button
               class="relative aspect-square overflow-hidden rounded-lg border-2 {selectedMediaId === mediaItem._id ? 'border-fulala-red' : 'border-transparent'}"
               onclick={() => (selectedMediaId = mediaItem._id)}

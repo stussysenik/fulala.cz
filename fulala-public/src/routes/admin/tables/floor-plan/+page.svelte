@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const floorPlan = useQuery(api.floorPlans.getActive, {});
-  const updatePosition = useMutation(api.tables.updatePosition);
-  const updateTableStatus = useMutation(api.tables.updateStatus);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const floorPlanQuery = useQuery(api.floorPlans.getActive, () => ({}));
 
   // Canvas state
   let canvasWidth = $state(800);
@@ -32,7 +33,8 @@
   }
 
   function handleMouseMove(e: MouseEvent) {
-    if (!draggingTable || !$floorPlan) return;
+    const floorPlan = floorPlanQuery.data;
+    if (!draggingTable || !floorPlan) return;
 
     const canvas = document.getElementById('floor-plan-canvas');
     if (!canvas) return;
@@ -42,7 +44,7 @@
     const y = Math.max(0, Math.min(canvasHeight - 80, e.clientY - rect.top - dragOffset.y));
 
     // Update local position (optimistic)
-    const table = $floorPlan.tables.find((t: any) => t._id === draggingTable);
+    const table = floorPlan.tables.find((t: any) => t._id === draggingTable);
     if (table) {
       table.position.x = x;
       table.position.y = y;
@@ -50,11 +52,12 @@
   }
 
   async function handleMouseUp() {
-    if (!draggingTable || !$floorPlan) return;
+    const floorPlan = floorPlanQuery.data;
+    if (!draggingTable || !floorPlan) return;
 
-    const table = $floorPlan.tables.find((t: any) => t._id === draggingTable);
+    const table = floorPlan.tables.find((t: any) => t._id === draggingTable);
     if (table) {
-      await updatePosition({
+      await client.mutation(api.tables.updatePosition, {
         id: table._id,
         position: table.position,
       });
@@ -67,7 +70,7 @@
     const statusOrder = ['available', 'occupied', 'reserved', 'cleaning'];
     const currentIndex = statusOrder.indexOf(table.status);
     const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length];
-    await updateTableStatus({ id: table._id, status: nextStatus as any });
+    await client.mutation(api.tables.updateStatus, { id: table._id, status: nextStatus as any });
   }
 </script>
 
@@ -129,11 +132,11 @@
     class="relative bg-neutral-50"
     style="width: {canvasWidth}px; height: {canvasHeight}px; background-image: radial-gradient(circle, #ddd 1px, transparent 1px); background-size: 20px 20px;"
   >
-    {#if $floorPlan === undefined}
+    {#if floorPlanQuery.data === undefined}
       <div class="flex h-full items-center justify-center">
         <div class="text-neutral-400">Loading floor plan...</div>
       </div>
-    {:else if !$floorPlan || $floorPlan.tables.length === 0}
+    {:else if !floorPlanQuery.data || floorPlanQuery.data.tables.length === 0}
       <div class="flex h-full items-center justify-center">
         <div class="text-center">
           <p class="text-neutral-500">No tables on this floor plan</p>
@@ -143,7 +146,7 @@
         </div>
       </div>
     {:else}
-      {#each $floorPlan.tables as table}
+      {#each floorPlanQuery.data.tables as table}
         <div
           class="absolute flex cursor-move select-none flex-col items-center justify-center border-2 transition-shadow hover:shadow-lg {statusColors[table.status]} {table.shape === 'round' ? 'rounded-full' : 'rounded-lg'}"
           style="left: {table.position.x}px; top: {table.position.y}px; width: {table.position.width}px; height: {table.position.height}px; {table.position.rotation ? `transform: rotate(${table.position.rotation}deg)` : ''}"

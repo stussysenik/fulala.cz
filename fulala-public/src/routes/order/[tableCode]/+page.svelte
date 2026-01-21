@@ -1,24 +1,25 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { Button, Card, Badge } from '$lib/components/ui';
   import { fly, fade } from 'svelte/transition';
 
   // Get table code from URL
   const tableCode = $page.params.tableCode;
 
-  // Queries
-  const qrCode = useQuery(api.qrCodes.getByCode, { code: tableCode });
-  const menuItems = useQuery(api.menu.list, {});
-  const categories = useQuery(api.categories.list, {});
-  const recordScan = useMutation(api.qrCodes.recordScan);
-  const createOrder = useMutation(api.orders.create);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries - use arrow function syntax for args
+  const qrCodeQuery = useQuery(api.qrCodes.getByCode, () => ({ code: tableCode }));
+  const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+  const categoriesQuery = useQuery(api.categories.list, () => ({}));
 
   // Record scan on mount
   $effect(() => {
     if (tableCode) {
-      recordScan({ code: tableCode }).catch(() => {});
+      client.mutation(api.qrCodes.recordScan, { code: tableCode }).catch(() => {});
     }
   });
 
@@ -45,13 +46,14 @@
   const cartCount = $derived(cart.reduce((sum, item) => sum + item.quantity, 0));
 
   const filteredMenuItems = $derived(() => {
-    if (!$menuItems) return [];
-    const available = $menuItems.filter((item) => item.isAvailable);
+    const menuItems = menuItemsQuery.data;
+    if (!menuItems) return [];
+    const available = menuItems.filter((item) => item.isAvailable);
     if (activeCategory === 'all') return available;
     return available.filter((item) => item.category === activeCategory);
   });
 
-  function addToCart(item: NonNullable<typeof $menuItems>[number]) {
+  function addToCart(item: NonNullable<typeof menuItemsQuery.data>[number]) {
     const existing = cart.find((c) => c.menuItemId === item._id);
     if (existing) {
       existing.quantity += 1;
@@ -89,8 +91,9 @@
     submitting = true;
 
     try {
-      const orderId = await createOrder({
-        tableId: $qrCode?.tableId || undefined,
+      const qrCode = qrCodeQuery.data;
+      const orderId = await client.mutation(api.orders.create, {
+        tableId: qrCode?.tableId || undefined,
         items: cart.map((item) => ({
           menuItemId: item.menuItemId as any,
           title: item.title,
@@ -117,7 +120,7 @@
 </script>
 
 <svelte:head>
-  <title>{$qrCode?.table?.name || 'Order'} - Fulala</title>
+  <title>{qrCodeQuery.data?.table?.name || 'Order'} - Fulala</title>
 </svelte:head>
 
 <main class="min-h-screen bg-tiger-orange/30 pb-24">
@@ -128,8 +131,8 @@
         <span class="text-2xl">🥟</span>
         <div>
           <h1 class="font-chewy text-xl text-fulala-red">Fulala</h1>
-          {#if $qrCode?.table}
-            <p class="text-xs text-soy-brown">{$qrCode.table.name}</p>
+          {#if qrCodeQuery.data?.table}
+            <p class="text-xs text-soy-brown">{qrCodeQuery.data.table.name}</p>
           {/if}
         </div>
       </div>
@@ -189,8 +192,8 @@
         >
           All
         </button>
-        {#if $categories}
-          {#each $categories as category}
+        {#if categoriesQuery.data}
+          {#each categoriesQuery.data as category}
             <button
               class="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors {activeCategory === category.slug ? 'bg-fulala-red text-white' : 'bg-white text-soy-brown'}"
               onclick={() => (activeCategory = category.slug)}
@@ -205,7 +208,7 @@
     <!-- Menu Items -->
     <div class="mx-auto max-w-4xl px-4 py-4">
       <div class="space-y-3">
-        {#if $menuItems === undefined}
+        {#if menuItemsQuery.data === undefined}
           {#each Array(6) as _}
             <div class="animate-pulse rounded-xl bg-white p-4">
               <div class="h-6 w-1/2 rounded bg-neutral-200"></div>
@@ -294,7 +297,7 @@
                 <button
                   class="h-6 w-6 rounded-full bg-fulala-red text-white"
                   onclick={() => {
-                    const menuItem = $menuItems?.find((m) => m._id === item.menuItemId);
+                    const menuItem = menuItemsQuery.data?.find((m) => m._id === item.menuItemId);
                     if (menuItem) addToCart(menuItem);
                   }}
                 >

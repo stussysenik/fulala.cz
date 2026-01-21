@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Input, Card, Dialog } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const categories = useQuery(api.categories.list, {});
-  const createCategory = useMutation(api.categories.create);
-  const updateCategory = useMutation(api.categories.update);
-  const deleteCategory = useMutation(api.categories.remove);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const categoriesQuery = useQuery(api.categories.list, () => ({}));
 
   // State
   let showCreateDialog = $state(false);
   let showEditDialog = $state(false);
   let showDeleteDialog = $state(false);
-  let selectedCategory = $state<typeof $categories extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedCategory = $state<NonNullable<typeof categoriesQuery.data>[number] | null>(null);
 
   // Form state
   let formData = $state({
@@ -51,7 +51,7 @@
   }
 
   async function handleCreate() {
-    await createCategory({
+    await client.mutation(api.categories.create, {
       name: formData.name,
       slug: formData.slug || generateSlug(formData.name),
       description: formData.description || undefined,
@@ -61,7 +61,7 @@
 
   async function handleUpdate() {
     if (!selectedCategory) return;
-    await updateCategory({
+    await client.mutation(api.categories.update, {
       id: selectedCategory._id,
       name: formData.name,
       slug: formData.slug,
@@ -73,7 +73,7 @@
 
   async function handleDelete() {
     if (!selectedCategory) return;
-    await deleteCategory({ id: selectedCategory._id });
+    await client.mutation(api.categories.remove, { id: selectedCategory._id });
     showDeleteDialog = false;
     selectedCategory = null;
   }
@@ -107,7 +107,7 @@
 
 <!-- Categories Grid -->
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-  {#if $categories === undefined}
+  {#if categoriesQuery.data === undefined}
     {#each Array(6) as _}
       <Card>
         <div class="animate-pulse">
@@ -116,7 +116,7 @@
         </div>
       </Card>
     {/each}
-  {:else if $categories.length === 0}
+  {:else if categoriesQuery.data.length === 0}
     <div class="col-span-full">
       <Card class="py-12 text-center">
         <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
@@ -130,7 +130,7 @@
       </Card>
     </div>
   {:else}
-    {#each $categories as category, index}
+    {#each categoriesQuery.data as category, index}
       <Card
         interactive
         onclick={() => openEditDialog(category)}

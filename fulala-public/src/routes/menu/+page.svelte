@@ -1,14 +1,14 @@
 <script lang="ts">
   import { fly, fade } from 'svelte/transition';
   import { onMount } from 'svelte';
-  import { useQuery } from 'convex/svelte';
-  import { api } from '../../convex/_generated/api';
+  import { useQuery } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import MenuItemCard from '$lib/components/MenuItemCard.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
 
-  // Live Convex queries
-  const menuItems = useQuery(api.menu.list, {});
-  const categories = useQuery(api.categories.list, {});
+  // Live Convex queries - convex-svelte API returns {isLoading, error, data}
+  const menuItemsQuery = useQuery(api.menu.list, () => ({}));
+  const categoriesQuery = useQuery(api.categories.list, () => ({}));
 
   let mounted = $state(false);
   let activeCategory = $state<string | null>(null);
@@ -18,17 +18,20 @@
   });
 
   // Loading state based on Convex query status
-  const loading = $derived($menuItems === undefined || $categories === undefined);
+  const loading = $derived(menuItemsQuery.isLoading || categoriesQuery.isLoading);
 
   // Group menu items by category
   const menuCategories = $derived(() => {
-    if (!$menuItems || !$categories) return [];
+    const menuItems = menuItemsQuery.data;
+    const categories = categoriesQuery.data;
 
-    return $categories.map(category => ({
+    if (!menuItems || !categories) return [];
+
+    return categories.map(category => ({
       name: category.name,
       slug: category.slug,
       description: category.description || '',
-      items: $menuItems
+      items: menuItems
         .filter(item => item.category === category.slug && item.isAvailable)
         .sort((a, b) => a.sortOrder - b.sortOrder)
     })).filter(cat => cat.items.length > 0);
@@ -47,7 +50,7 @@
   <meta name="description" content="Explore our menu of handmade dumplings, buns, noodles, and sides." />
 </svelte:head>
 
-<div class="max-w-4xl mx-auto px-6 py-12">
+<div class="max-w-4xl mx-auto px-6 py-12 bg-white min-h-screen">
   <!-- Header -->
   {#if mounted}
     <div in:fly={{ y: -20, duration: 400 }} class="text-center mb-12">
@@ -71,7 +74,7 @@
         class="px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200
                {activeCategory === null
           ? 'bg-fulala-red text-white'
-          : 'bg-tiger-orange text-soy-brown hover:bg-fulala-red/10'}"
+          : 'bg-neutral-100 text-soy-brown hover:bg-fulala-red/10'}"
       >
         All
       </button>
@@ -81,7 +84,7 @@
           class="px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200
                  {activeCategory === category.slug
             ? 'bg-fulala-red text-white'
-            : 'bg-tiger-orange text-soy-brown hover:bg-fulala-red/10'}"
+            : 'bg-neutral-100 text-soy-brown hover:bg-fulala-red/10'}"
         >
           {category.name}
         </button>
@@ -98,7 +101,7 @@
           <Skeleton width="w-32" height="h-8" class="mb-6" />
           <div class="space-y-6">
             {#each [1, 2, 3] as _}
-              <div class="border-b-2 border-dashed border-tiger-orange pb-6">
+              <div class="border-b-2 border-dashed border-neutral-200 pb-6">
                 <div class="flex justify-between items-start gap-4">
                   <div class="flex-1 space-y-2">
                     <Skeleton width="w-48" height="h-6" />
@@ -145,7 +148,7 @@
   {#if mounted && !loading}
     <div
       in:fly={{ y: 30, duration: 400, delay: 600 }}
-      class="mt-16 text-center p-8 bg-tiger-orange/30 rounded-2xl"
+      class="mt-16 text-center p-8 bg-neutral-50 rounded-2xl"
     >
       <p class="text-lg text-soy-brown mb-4">
         Can't decide? Trust our kitchen!

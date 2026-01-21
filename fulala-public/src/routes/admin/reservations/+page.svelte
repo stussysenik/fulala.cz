@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge, Dialog, Input, Select, Tabs } from '$lib/components/ui';
+
+  // Convex client for mutations
+  const client = useConvexClient();
 
   // Get today's date
   const today = new Date().toISOString().split('T')[0];
 
-  // Queries & Mutations
-  const reservations = useQuery(api.reservations.list, { date: today });
-  const stats = useQuery(api.reservations.getStats, { date: today });
-  const tables = useQuery(api.tables.list, { activeOnly: true });
-  const createReservation = useMutation(api.reservations.create);
-  const updateReservation = useMutation(api.reservations.update);
-  const updateStatus = useMutation(api.reservations.updateStatus);
-  const assignTable = useMutation(api.reservations.assignTable);
-  const cancelReservation = useMutation(api.reservations.cancel);
+  // State - these need to be declared before useQuery so they're available
+  let selectedDate = $state(today);
+
+  // Queries
+  const reservationsQuery = useQuery(api.reservations.list, () => ({ date: selectedDate }));
+  const statsQuery = useQuery(api.reservations.getStats, () => ({ date: selectedDate }));
+  const tablesQuery = useQuery(api.tables.list, () => ({ activeOnly: true }));
 
   // State
-  let selectedDate = $state(today);
   let showCreateDialog = $state(false);
   let showDetailsDialog = $state(false);
-  let selectedReservation = $state<typeof $reservations extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedReservation = $state<NonNullable<typeof reservationsQuery.data>[number] | null>(null);
 
   let formData = $state({
     guestName: '',
@@ -49,8 +49,9 @@
   };
 
   const tableOptions = $derived(() => {
-    if (!$tables) return [];
-    return $tables.map((t) => ({ value: t._id, label: `${t.name} (${t.capacity} seats)` }));
+    const tables = tablesQuery.data;
+    if (!tables) return [];
+    return tables.map((t) => ({ value: t._id, label: `${t.name} (${t.capacity} seats)` }));
   });
 
   function openCreateDialog() {
@@ -73,7 +74,7 @@
   }
 
   async function handleCreate() {
-    await createReservation({
+    await client.mutation(api.reservations.create, {
       guestName: formData.guestName,
       phone: formData.phone,
       email: formData.email || undefined,
@@ -88,14 +89,14 @@
 
   async function handleStatusChange(status: 'pending' | 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'no_show') {
     if (!selectedReservation) return;
-    await updateStatus({ id: selectedReservation._id, status });
+    await client.mutation(api.reservations.updateStatus, { id: selectedReservation._id, status });
     showDetailsDialog = false;
     selectedReservation = null;
   }
 
   async function handleAssignTable(tableId: string) {
     if (!selectedReservation) return;
-    await assignTable({ id: selectedReservation._id, tableId: tableId as any });
+    await client.mutation(api.reservations.assignTable, { id: selectedReservation._id, tableId: tableId as any });
   }
 
   function formatTime(time: string): string {
@@ -130,26 +131,26 @@
 <!-- Stats -->
 <div class="mb-6 grid gap-4 sm:grid-cols-4">
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$stats?.total ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{statsQuery.data?.total ?? 0}</p>
     <p class="text-sm text-neutral-500">Total</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-blue-600">{$stats?.confirmed ?? 0}</p>
+    <p class="text-2xl font-bold text-blue-600">{statsQuery.data?.confirmed ?? 0}</p>
     <p class="text-sm text-neutral-500">Confirmed</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-green-600">{$stats?.seated ?? 0}</p>
+    <p class="text-2xl font-bold text-green-600">{statsQuery.data?.seated ?? 0}</p>
     <p class="text-sm text-neutral-500">Seated</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$stats?.totalGuests ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{statsQuery.data?.totalGuests ?? 0}</p>
     <p class="text-sm text-neutral-500">Expected Guests</p>
   </Card>
 </div>
 
 <!-- Reservations List -->
 <Card>
-  {#if $reservations === undefined}
+  {#if reservationsQuery.data === undefined}
     <div class="space-y-3">
       {#each Array(5) as _}
         <div class="animate-pulse flex items-center gap-4 rounded-lg bg-neutral-50 p-4">
@@ -161,14 +162,14 @@
         </div>
       {/each}
     </div>
-  {:else if $reservations.length === 0}
+  {:else if reservationsQuery.data.length === 0}
     <div class="py-12 text-center">
       <p class="text-neutral-500">No reservations for {selectedDate}</p>
       <Button class="mt-4" onclick={openCreateDialog}>Create Reservation</Button>
     </div>
   {:else}
     <div class="divide-y divide-neutral-100">
-      {#each $reservations as reservation}
+      {#each reservationsQuery.data as reservation}
         <div
           class="flex cursor-pointer items-center gap-4 p-4 hover:bg-neutral-50"
           onclick={() => openDetails(reservation)}

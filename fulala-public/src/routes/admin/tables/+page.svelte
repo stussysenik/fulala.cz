@@ -1,21 +1,20 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge, Dialog, Input, Select } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const tables = useQuery(api.tables.list, { activeOnly: true });
-  const tableStats = useQuery(api.tables.getStats, {});
-  const createTable = useMutation(api.tables.create);
-  const updateTable = useMutation(api.tables.update);
-  const updateTableStatus = useMutation(api.tables.updateStatus);
-  const deleteTable = useMutation(api.tables.remove);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const tablesQuery = useQuery(api.tables.list, () => ({ activeOnly: true }));
+  const tableStatsQuery = useQuery(api.tables.getStats, () => ({}));
 
   // State
   let showCreateDialog = $state(false);
   let showEditDialog = $state(false);
-  let selectedTable = $state<typeof $tables extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedTable = $state<NonNullable<typeof tablesQuery.data>[number] | null>(null);
 
   let formData = $state({
     name: '',
@@ -52,7 +51,7 @@
   }
 
   async function handleCreate() {
-    await createTable({
+    await client.mutation(api.tables.create, {
       name: formData.name,
       capacity: formData.capacity,
       shape: formData.shape,
@@ -63,7 +62,7 @@
 
   async function handleUpdate() {
     if (!selectedTable) return;
-    await updateTable({
+    await client.mutation(api.tables.update, {
       id: selectedTable._id,
       name: formData.name,
       capacity: formData.capacity,
@@ -74,12 +73,12 @@
   }
 
   async function handleStatusChange(table: NonNullable<typeof selectedTable>, status: 'available' | 'occupied' | 'reserved' | 'cleaning') {
-    await updateTableStatus({ id: table._id, status });
+    await client.mutation(api.tables.updateStatus, { id: table._id, status });
   }
 
   async function handleDelete() {
     if (!selectedTable) return;
-    await deleteTable({ id: selectedTable._id });
+    await client.mutation(api.tables.remove, { id: selectedTable._id });
     showEditDialog = false;
     selectedTable = null;
   }
@@ -115,30 +114,30 @@
 <!-- Stats -->
 <div class="mb-6 grid gap-4 sm:grid-cols-5">
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$tableStats?.total ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{tableStatsQuery.data?.total ?? 0}</p>
     <p class="text-sm text-neutral-500">Total Tables</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-green-600">{$tableStats?.available ?? 0}</p>
+    <p class="text-2xl font-bold text-green-600">{tableStatsQuery.data?.available ?? 0}</p>
     <p class="text-sm text-neutral-500">Available</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-red-600">{$tableStats?.occupied ?? 0}</p>
+    <p class="text-2xl font-bold text-red-600">{tableStatsQuery.data?.occupied ?? 0}</p>
     <p class="text-sm text-neutral-500">Occupied</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-yellow-600">{$tableStats?.reserved ?? 0}</p>
+    <p class="text-2xl font-bold text-yellow-600">{tableStatsQuery.data?.reserved ?? 0}</p>
     <p class="text-sm text-neutral-500">Reserved</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$tableStats?.totalCapacity ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{tableStatsQuery.data?.totalCapacity ?? 0}</p>
     <p class="text-sm text-neutral-500">Total Seats</p>
   </Card>
 </div>
 
 <!-- Tables Grid -->
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-  {#if $tables === undefined}
+  {#if tablesQuery.data === undefined}
     {#each Array(8) as _}
       <Card>
         <div class="animate-pulse space-y-3">
@@ -147,7 +146,7 @@
         </div>
       </Card>
     {/each}
-  {:else if $tables.length === 0}
+  {:else if tablesQuery.data.length === 0}
     <div class="col-span-full">
       <Card class="py-12 text-center">
         <p class="text-neutral-500">No tables yet. Add your first table to get started.</p>
@@ -155,7 +154,7 @@
       </Card>
     </div>
   {:else}
-    {#each $tables as table}
+    {#each tablesQuery.data as table}
       <Card class="group">
         <div class="flex items-start justify-between">
           <div>

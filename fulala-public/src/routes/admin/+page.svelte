@@ -1,13 +1,18 @@
 <script lang="ts">
-  import { useQuery } from 'convex/svelte';
-  import { api } from '../../../convex/_generated/api';
+  import { useQuery } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader, DashboardMetric } from '$lib/components/admin';
   import { Card, Badge, Button } from '$lib/components/ui';
 
-  // Queries
-  const orderStats = useQuery(api.orders.getStats, {});
-  const tableStats = useQuery(api.tables.getStats, {});
-  const reservationStats = useQuery(api.reservations.getStats, {});
+  // Queries - convex-svelte returns {isLoading, error, data}
+  const orderStatsQuery = useQuery(api.orders.getStats, () => ({}));
+  const tableStatsQuery = useQuery(api.tables.getStats, () => ({}));
+  const reservationStatsQuery = useQuery(api.reservations.getStats, () => ({}));
+
+  // Derived data
+  const orderStats = $derived(orderStatsQuery.data);
+  const tableStats = $derived(tableStatsQuery.data);
+  const reservationStats = $derived(reservationStatsQuery.data);
 
   // Recent orders (mock for now)
   const recentOrders = [
@@ -40,7 +45,7 @@
 <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
   <DashboardMetric
     label="Today's Orders"
-    value={$orderStats?.totalToday ?? 0}
+    value={orderStats?.totalToday ?? 0}
     change={12}
     trend="up"
     variant="primary"
@@ -54,7 +59,7 @@
 
   <DashboardMetric
     label="Revenue Today"
-    value="{($orderStats?.revenueToday ?? 0).toLocaleString()} Kč"
+    value="{(orderStats?.revenueToday ?? 0).toLocaleString()} Kč"
     change={8}
     trend="up"
     variant="success"
@@ -68,7 +73,7 @@
 
   <DashboardMetric
     label="Tables Available"
-    value="{$tableStats?.available ?? 0}/{$tableStats?.total ?? 0}"
+    value="{tableStats?.available ?? 0}/{tableStats?.total ?? 0}"
     variant="default"
   >
     {#snippet icon()}
@@ -80,7 +85,7 @@
 
   <DashboardMetric
     label="Reservations Today"
-    value={$reservationStats?.total ?? 0}
+    value={reservationStats?.total ?? 0}
     change={5}
     trend="up"
     variant="warning"
@@ -206,7 +211,7 @@
           <div class="h-2 w-24 overflow-hidden rounded-full bg-neutral-100">
             <div class="h-full w-1/4 bg-yellow-500"></div>
           </div>
-          <span class="text-sm font-medium">{$orderStats?.pendingCount ?? 0}</span>
+          <span class="text-sm font-medium">{orderStats?.pendingCount ?? 0}</span>
         </div>
       </div>
       <div class="flex items-center justify-between">
@@ -215,7 +220,7 @@
           <div class="h-2 w-24 overflow-hidden rounded-full bg-neutral-100">
             <div class="h-full w-1/2 bg-blue-500"></div>
           </div>
-          <span class="text-sm font-medium">{$orderStats?.preparingCount ?? 0}</span>
+          <span class="text-sm font-medium">{orderStats?.preparingCount ?? 0}</span>
         </div>
       </div>
       <div class="flex items-center justify-between">
@@ -224,7 +229,7 @@
           <div class="h-2 w-24 overflow-hidden rounded-full bg-neutral-100">
             <div class="h-full w-1/3 bg-green-500"></div>
           </div>
-          <span class="text-sm font-medium">{$orderStats?.readyCount ?? 0}</span>
+          <span class="text-sm font-medium">{orderStats?.readyCount ?? 0}</span>
         </div>
       </div>
     </div>
@@ -241,9 +246,9 @@
 
     <div class="space-y-3">
       <div class="flex items-center gap-3 text-sm text-neutral-500">
-        <span class="font-medium">{$reservationStats?.confirmed ?? 0} confirmed</span>
+        <span class="font-medium">{reservationStats?.confirmed ?? 0} confirmed</span>
         <span>•</span>
-        <span>{$reservationStats?.totalGuests ?? 0} guests expected</span>
+        <span>{reservationStats?.totalGuests ?? 0} guests expected</span>
       </div>
 
       <p class="py-4 text-center text-neutral-400">

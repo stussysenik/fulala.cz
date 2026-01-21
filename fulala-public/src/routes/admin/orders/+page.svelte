@@ -1,31 +1,37 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge, Tabs, Dialog } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const orders = useQuery(api.orders.list, {});
-  const orderStats = useQuery(api.orders.getStats, {});
-  const updateOrderStatus = useMutation(api.orders.updateStatus);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const ordersQuery = useQuery(api.orders.list, () => ({}));
+  const orderStatsQuery = useQuery(api.orders.getStats, () => ({}));
 
   // State
   let activeTab = $state('all');
-  let selectedOrder = $state<typeof $orders extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedOrder = $state<NonNullable<typeof ordersQuery.data>[number] | null>(null);
   let showOrderDetails = $state(false);
 
-  const tabs = [
-    { id: 'all', label: 'All Orders' },
-    { id: 'pending', label: 'Pending', badge: $orderStats?.pendingCount },
-    { id: 'preparing', label: 'Preparing', badge: $orderStats?.preparingCount },
-    { id: 'ready', label: 'Ready', badge: $orderStats?.readyCount },
-    { id: 'completed', label: 'Completed' },
-  ];
+  const tabs = $derived(() => {
+    const stats = orderStatsQuery.data;
+    return [
+      { id: 'all', label: 'All Orders' },
+      { id: 'pending', label: 'Pending', badge: stats?.pendingCount },
+      { id: 'preparing', label: 'Preparing', badge: stats?.preparingCount },
+      { id: 'ready', label: 'Ready', badge: stats?.readyCount },
+      { id: 'completed', label: 'Completed' },
+    ];
+  });
 
   const filteredOrders = $derived(() => {
-    if (!$orders) return [];
-    if (activeTab === 'all') return $orders;
-    return $orders.filter((o) => o.status === activeTab);
+    const orders = ordersQuery.data;
+    if (!orders) return [];
+    if (activeTab === 'all') return orders;
+    return orders.filter((o) => o.status === activeTab);
   });
 
   const statusColors: Record<string, 'warning' | 'info' | 'success' | 'danger' | 'default'> = {
@@ -54,7 +60,7 @@
   async function advanceStatus(order: NonNullable<typeof selectedOrder>) {
     const next = nextStatus[order.status];
     if (next) {
-      await updateOrderStatus({
+      await client.mutation(api.orders.updateStatus, {
         id: order._id,
         status: next as any,
       });
@@ -62,7 +68,7 @@
   }
 
   async function cancelOrder(order: NonNullable<typeof selectedOrder>) {
-    await updateOrderStatus({
+    await client.mutation(api.orders.updateStatus, {
       id: order._id,
       status: 'cancelled',
     });
@@ -91,33 +97,33 @@
 <!-- Stats -->
 <div class="mb-6 grid gap-4 sm:grid-cols-4">
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$orderStats?.totalToday ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{orderStatsQuery.data?.totalToday ?? 0}</p>
     <p class="text-sm text-neutral-500">Today's Orders</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-fulala-red">{$orderStats?.activeCount ?? 0}</p>
+    <p class="text-2xl font-bold text-fulala-red">{orderStatsQuery.data?.activeCount ?? 0}</p>
     <p class="text-sm text-neutral-500">Active</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-green-600">{$orderStats?.completedToday ?? 0}</p>
+    <p class="text-2xl font-bold text-green-600">{orderStatsQuery.data?.completedToday ?? 0}</p>
     <p class="text-sm text-neutral-500">Completed</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{($orderStats?.revenueToday ?? 0).toLocaleString()} Kč</p>
+    <p class="text-2xl font-bold text-neutral-900">{(orderStatsQuery.data?.revenueToday ?? 0).toLocaleString()} Kč</p>
     <p class="text-sm text-neutral-500">Revenue</p>
   </Card>
 </div>
 
 <!-- Tabs -->
 <Tabs
-  {tabs}
+  tabs={tabs()}
   bind:activeTab
   class="mb-6"
 />
 
 <!-- Orders Grid -->
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-  {#if $orders === undefined}
+  {#if ordersQuery.data === undefined}
     {#each Array(6) as _}
       <Card>
         <div class="animate-pulse space-y-3">

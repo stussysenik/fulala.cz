@@ -1,30 +1,28 @@
 <script lang="ts">
-  import { useQuery, useMutation } from 'convex/svelte';
-  import { api } from '../../../../convex/_generated/api';
+  import { useQuery, useConvexClient } from 'convex-svelte';
+  import { api } from '$convex/_generated/api';
   import { AdminHeader } from '$lib/components/admin';
   import { Button, Card, Badge, Dialog } from '$lib/components/ui';
 
-  // Queries & Mutations
-  const qrCodes = useQuery(api.qrCodes.list, {});
-  const stats = useQuery(api.qrCodes.getStats, {});
-  const tables = useQuery(api.tables.list, { activeOnly: true });
-  const createQRCode = useMutation(api.qrCodes.create);
-  const generateForAllTables = useMutation(api.qrCodes.generateForAllTables);
-  const toggleActive = useMutation(api.qrCodes.toggleActive);
-  const regenerate = useMutation(api.qrCodes.regenerate);
-  const deleteQRCode = useMutation(api.qrCodes.remove);
+  // Convex client for mutations
+  const client = useConvexClient();
+
+  // Queries
+  const qrCodesQuery = useQuery(api.qrCodes.list, () => ({}));
+  const statsQuery = useQuery(api.qrCodes.getStats, () => ({}));
+  const tablesQuery = useQuery(api.tables.list, () => ({ activeOnly: true }));
 
   // State
   let showCreateDialog = $state(false);
   let showQRDialog = $state(false);
-  let selectedQR = $state<typeof $qrCodes extends (infer T)[] | undefined ? T : never | null>(null);
+  let selectedQR = $state<NonNullable<typeof qrCodesQuery.data>[number] | null>(null);
   let newQRType = $state<'table_order' | 'menu_view' | 'reservation'>('table_order');
   let newQRTableId = $state<string>('');
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://fulala.cz';
 
   async function handleCreate() {
-    await createQRCode({
+    await client.mutation(api.qrCodes.create, {
       type: newQRType,
       tableId: newQRTableId ? (newQRTableId as any) : undefined,
       baseUrl,
@@ -35,20 +33,20 @@
   }
 
   async function handleGenerateAll() {
-    await generateForAllTables({ baseUrl });
+    await client.mutation(api.qrCodes.generateForAllTables, { baseUrl });
   }
 
   async function handleToggle(qr: NonNullable<typeof selectedQR>) {
-    await toggleActive({ id: qr._id });
+    await client.mutation(api.qrCodes.toggleActive, { id: qr._id });
   }
 
   async function handleRegenerate(qr: NonNullable<typeof selectedQR>) {
-    await regenerate({ id: qr._id });
+    await client.mutation(api.qrCodes.regenerate, { id: qr._id });
   }
 
   async function handleDelete(qr: NonNullable<typeof selectedQR>) {
     if (confirm('Delete this QR code?')) {
-      await deleteQRCode({ id: qr._id });
+      await client.mutation(api.qrCodes.remove, { id: qr._id });
     }
   }
 
@@ -95,26 +93,26 @@
 <!-- Stats -->
 <div class="mb-6 grid gap-4 sm:grid-cols-4">
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$stats?.total ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{statsQuery.data?.total ?? 0}</p>
     <p class="text-sm text-neutral-500">Total Codes</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-green-600">{$stats?.active ?? 0}</p>
+    <p class="text-2xl font-bold text-green-600">{statsQuery.data?.active ?? 0}</p>
     <p class="text-sm text-neutral-500">Active</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-blue-600">{$stats?.totalScans ?? 0}</p>
+    <p class="text-2xl font-bold text-blue-600">{statsQuery.data?.totalScans ?? 0}</p>
     <p class="text-sm text-neutral-500">Total Scans</p>
   </Card>
   <Card class="text-center">
-    <p class="text-2xl font-bold text-neutral-900">{$stats?.tableOrderCodes ?? 0}</p>
+    <p class="text-2xl font-bold text-neutral-900">{statsQuery.data?.tableOrderCodes ?? 0}</p>
     <p class="text-sm text-neutral-500">Table QRs</p>
   </Card>
 </div>
 
 <!-- QR Codes Grid -->
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-  {#if $qrCodes === undefined}
+  {#if qrCodesQuery.data === undefined}
     {#each Array(8) as _}
       <Card>
         <div class="animate-pulse space-y-3">
@@ -123,7 +121,7 @@
         </div>
       </Card>
     {/each}
-  {:else if $qrCodes.length === 0}
+  {:else if qrCodesQuery.data.length === 0}
     <div class="col-span-full">
       <Card class="py-12 text-center">
         <p class="text-neutral-500">No QR codes yet</p>
@@ -131,7 +129,7 @@
       </Card>
     </div>
   {:else}
-    {#each $qrCodes as qr}
+    {#each qrCodesQuery.data as qr}
       <Card class="text-center">
         <div
           class="mx-auto mb-3 cursor-pointer rounded-lg bg-white p-2 shadow-sm hover:shadow-md transition-shadow"
@@ -221,7 +219,7 @@
       </select>
     </div>
 
-    {#if newQRType === 'table_order' && $tables}
+    {#if newQRType === 'table_order' && tablesQuery.data}
       <div>
         <label class="mb-1.5 block text-sm font-medium text-neutral-700">Table (optional)</label>
         <select
@@ -229,7 +227,7 @@
           bind:value={newQRTableId}
         >
           <option value="">No specific table</option>
-          {#each $tables as table}
+          {#each tablesQuery.data as table}
             <option value={table._id}>{table.name}</option>
           {/each}
         </select>
