@@ -24,8 +24,12 @@
 <header class="sticky top-0 z-50 bg-dough-white/95 backdrop-blur-sm border-b-2 border-dashed border-tiger-orange">
   <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
     <!-- Logo -->
-    <a href="/" class="text-3xl md:text-4xl text-fulala-red hover:scale-105 transition-transform" onclick={closeMenu}>
-      Fulala
+    <a href="/" class="hover:scale-105 transition-transform" onclick={closeMenu}>
+      <img
+        src="/logo-horizontal.jpg"
+        alt="Fulala"
+        class="h-10 md:h-12 w-auto"
+      />
     </a>
 
     <!-- Desktop Navigation -->
