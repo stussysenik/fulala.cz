@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "sveltekit",
+  "env": {
+    "PUBLIC_CONVEX_URL": "https://jovial-perch-285.convex.cloud"
+  }
+}
