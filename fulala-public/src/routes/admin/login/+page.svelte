@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-  <title>Login - Fulala Admin</title>
+  <title>Login - FULALA Admin</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center bg-tiger-orange/30 px-4">
@@ -23,7 +23,7 @@
     <!-- Logo -->
     <div class="mb-8 text-center">
       <span class="text-6xl">🥟</span>
-      <h1 class="mt-4 font-chewy text-3xl text-fulala-red">Fulala Admin</h1>
+      <h1 class="mt-4 font-heading text-3xl text-fulala-red">FULALA Admin</h1>
       <p class="mt-2 text-neutral-600">Sign in to manage your restaurant</p>
     </div>
 

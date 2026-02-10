@@ -1,15 +1,23 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { slide } from 'svelte/transition';
+  import LanguageToggle from './LanguageToggle.svelte';
+  import { getT } from '$lib/i18n/store.svelte';
 
   let mobileMenuOpen = $state(false);
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/menu', label: 'Menu' },
-    { href: '/story', label: 'Story' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  const navHrefs = ['/', '/menu', '/reservations', '/story', '/contact'] as const;
+
+  function getNavLinks() {
+    const t = getT();
+    return [
+      { href: '/', label: t.navHome },
+      { href: '/menu', label: t.navMenu },
+      { href: '/reservations', label: t.navReservations },
+      { href: '/story', label: t.navStory },
+      { href: '/contact', label: t.navContact },
+    ];
+  }
 
   function toggleMenu() {
     mobileMenuOpen = !mobileMenuOpen;
@@ -21,20 +29,20 @@
 </script>
 
 <!-- Cargo-inspired minimal navigation -->
-<header class="sticky top-0 z-50 bg-dough-white/95 backdrop-blur-sm border-b-2 border-dashed border-tiger-orange">
+<header class="sticky top-0 z-50 bg-dough-white/95 backdrop-blur-sm border-b-2 border-solid border-fulala-red">
   <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
     <!-- Logo -->
     <a href="/" class="hover:scale-105 transition-transform" onclick={closeMenu}>
       <img
         src="/logo-horizontal.jpg"
-        alt="Fulala"
-        class="h-10 md:h-12 w-auto"
+        alt="FULALA"
+        class="h-12 md:h-16 w-auto"
       />
     </a>
 
     <!-- Desktop Navigation -->
-    <div class="hidden md:flex items-center gap-8">
-      {#each navLinks as link}
+    <div class="hidden md:flex items-center gap-6">
+      {#each getNavLinks() as link}
         <a
           href={link.href}
           class="text-sm font-medium tracking-wide uppercase transition-colors duration-200
@@ -43,6 +51,7 @@
           {link.label}
         </a>
       {/each}
+      <LanguageToggle />
     </div>
 
     <!-- Mobile Menu Button -->
@@ -70,11 +79,11 @@
   <!-- Mobile Menu -->
   {#if mobileMenuOpen}
     <div
-      class="md:hidden border-t-2 border-dashed border-tiger-orange"
+      class="md:hidden border-t-2 border-solid border-fulala-red"
       transition:slide={{ duration: 200 }}
     >
       <div class="px-6 py-4 space-y-4">
-        {#each navLinks as link}
+        {#each getNavLinks() as link}
           <a
             href={link.href}
             onclick={closeMenu}
@@ -84,6 +93,9 @@
             {link.label}
           </a>
         {/each}
+        <div class="pt-2">
+          <LanguageToggle />
+        </div>
       </div>
     </div>
   {/if}

@@ -78,7 +78,7 @@
     {#if !collapsed}
       <a href="/admin" class="flex items-center gap-2">
         <span class="text-2xl">🥟</span>
-        <span class="font-chewy text-xl text-fulala-red">Fulala Admin</span>
+        <span class="font-heading text-xl text-fulala-red">FULALA Admin</span>
       </a>
     {:else}
       <a href="/admin" class="mx-auto">

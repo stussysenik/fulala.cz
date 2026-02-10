@@ -106,7 +106,7 @@
 </script>
 
 <svelte:head>
-  <title>Media Library - Fulala Admin</title>
+  <title>Media Library - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

@@ -87,7 +87,7 @@
 </script>
 
 <svelte:head>
-  <title>Categories - Fulala Admin</title>
+  <title>Categories - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

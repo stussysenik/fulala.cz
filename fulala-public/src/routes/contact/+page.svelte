@@ -2,6 +2,7 @@
   import { fly, fade } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { LocationMap } from '$lib/components/map';
+  import { getT } from '$lib/i18n/store.svelte';
 
   let mounted = $state(false);
   let formState = $state<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -24,43 +25,22 @@
   function resetForm() {
     formState = 'idle';
   }
-
-  const contactInfo = [
-    {
-      icon: '📍',
-      label: 'Address',
-      value: 'Prague, Czech Republic',
-      subtext: 'Location coming soon!',
-    },
-    {
-      icon: '⏰',
-      label: 'Hours',
-      value: 'Tue - Sun: 11:00 - 21:00',
-      subtext: 'Closed Mondays',
-    },
-    {
-      icon: '📧',
-      label: 'Email',
-      value: 'hello@fulala.cz',
-      link: 'mailto:hello@fulala.cz',
-    },
-  ];
 </script>
 
 <svelte:head>
-  <title>Contact | Fulala</title>
-  <meta name="description" content="Get in touch with Fulala. Find our location, hours, and contact information." />
+  <title>Contact | FULALA</title>
+  <meta name="description" content="Get in touch with FULALA. Find our location, hours, and contact information." />
 </svelte:head>
 
 <div class="max-w-4xl mx-auto px-6 py-12">
-  <!-- Header -->
+  <!-- Header with language toggle -->
   {#if mounted}
     <div in:fly={{ y: -20, duration: 400 }} class="text-center mb-16">
       <h1 class="text-5xl md:text-7xl text-fulala-red text-shadow mb-4">
-        FIND US
+        {getT().findUsTitle}
       </h1>
       <p class="text-lg text-soy-brown/70">
-        We'd love to see you!
+        {getT().findUsSubtitle}
       </p>
     </div>
   {/if}
@@ -69,41 +49,75 @@
     <!-- Contact Info -->
     {#if mounted}
       <div in:fly={{ x: -30, duration: 500, delay: 200 }} class="space-y-8">
-        <h2 class="text-3xl text-ink-black mb-6">Contact Info</h2>
+        <h2 class="text-3xl text-ink-black mb-6">{getT().contactInfo}</h2>
 
         <div class="space-y-6">
-          {#each contactInfo as info}
-            <div class="flex items-start gap-4">
-              <div class="text-3xl">{info.icon}</div>
-              <div>
-                <p class="text-sm text-soy-brown/50 uppercase tracking-wide">
-                  {info.label}
-                </p>
-                {#if info.link}
+          <!-- Address -->
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">📍</div>
+            <div>
+              <p class="text-sm text-soy-brown/50 uppercase tracking-wide">
+                {getT().address}
+              </p>
+              <a
+                href="https://maps.app.goo.gl/mE8kQm8nSKFb5P2H7"
+                class="text-lg text-ink-black hover:text-fulala-red transition-colors"
+              >
+                {getT().addressValue}
+              </a>
+              <p class="text-sm text-soy-brown/50">{getT().addressSubtext}</p>
+            </div>
+          </div>
+
+          <!-- Hours -->
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">⏰</div>
+            <div>
+              <p class="text-sm text-soy-brown/50 uppercase tracking-wide">
+                {getT().hours}
+              </p>
+              <p class="text-lg text-ink-black">{getT().hoursValue}</p>
+              <p class="text-sm text-soy-brown/50">{getT().hoursClosed}</p>
+            </div>
+          </div>
+
+          <!-- Email — Say hello in any language! -->
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">📧</div>
+            <div>
+              <p class="text-sm text-soy-brown/50 uppercase tracking-wide">
+                {getT().email}
+              </p>
+              <div class="space-y-1 mt-1">
+                {#each [
+                  { addr: 'ahoj@fulala.cz', flag: '🇨🇿' },
+                  { addr: 'hello@fulala.cz', flag: '🇬🇧' },
+                  { addr: 'nihao@fulala.cz', flag: '🇨🇳' },
+                  { addr: 'bonjour@fulala.cz', flag: '🇫🇷' },
+                  { addr: 'ciao@fulala.cz', flag: '🇮🇹' },
+                  { addr: 'dobryden@fulala.cz', flag: '🇷🇺' },
+                  { addr: 'nazdar@fulala.cz', flag: '🇨🇿' },
+                ] as item}
                   <a
-                    href={info.link}
-                    class="text-lg text-ink-black hover:text-fulala-red transition-colors"
+                    href="mailto:ahoj@fulala.cz"
+                    class="block text-sm text-ink-black hover:text-fulala-red transition-colors"
                   >
-                    {info.value}
+                    <span class="mr-1.5">{item.flag}</span>{item.addr}
                   </a>
-                {:else}
-                  <p class="text-lg text-ink-black">{info.value}</p>
-                {/if}
-                {#if info.subtext}
-                  <p class="text-sm text-soy-brown/50">{info.subtext}</p>
-                {/if}
+                {/each}
               </div>
             </div>
-          {/each}
+          </div>
         </div>
 
         <!-- Map -->
         <LocationMap
-          latitude={50.0755}
-          longitude={14.4378}
-          zoom={15}
-          markerTitle="Fulala"
-          address="Prague, Czech Republic"
+          latitude={50.0892311}
+          longitude={14.4202074}
+          zoom={17}
+          markerTitle="FULALA"
+          address="Kostečná 121/3, 110 00 Staré Město, Prague"
+          googleMapsUrl="https://maps.app.goo.gl/mE8kQm8nSKFb5P2H7"
           class="mt-8"
         />
       </div>
@@ -112,7 +126,7 @@
     <!-- Contact Form -->
     {#if mounted}
       <div in:fly={{ x: 30, duration: 500, delay: 300 }}>
-        <h2 class="text-3xl text-ink-black mb-6">Send a Message</h2>
+        <h2 class="text-3xl text-ink-black mb-6">{getT().sendMessage}</h2>
 
         {#if formState === 'success'}
           <div
@@ -120,19 +134,19 @@
             class="p-8 bg-tiger-orange/30 rounded-xl text-center"
           >
             <div class="text-5xl mb-4">🎉</div>
-            <h3 class="text-2xl text-ink-black mb-2">Message Sent!</h3>
+            <h3 class="text-2xl text-ink-black mb-2">{getT().messageSent}</h3>
             <p class="text-soy-brown/70 mb-6">
-              Thanks for reaching out! We'll get back to you soon.
+              {getT().messageSentDesc}
             </p>
             <button onclick={resetForm} class="btn-secondary">
-              Send Another
+              {getT().sendAnother}
             </button>
           </div>
         {:else}
           <form onsubmit={handleSubmit} class="space-y-6">
             <div>
               <label for="name" class="block text-sm text-soy-brown/70 mb-2">
-                Your Name
+                {getT().yourName}
               </label>
               <input
                 type="text"
@@ -143,13 +157,13 @@
                 class="w-full px-4 py-3 bg-white border-2 border-tiger-orange rounded-lg
                        focus:outline-none focus:border-fulala-red transition-colors
                        disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Tiger McTigerface"
+                placeholder={getT().namePlaceholder}
               />
             </div>
 
             <div>
               <label for="email" class="block text-sm text-soy-brown/70 mb-2">
-                Email
+                {getT().emailLabel}
               </label>
               <input
                 type="email"
@@ -160,13 +174,13 @@
                 class="w-full px-4 py-3 bg-white border-2 border-tiger-orange rounded-lg
                        focus:outline-none focus:border-fulala-red transition-colors
                        disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="tiger@example.com"
+                placeholder={getT().emailPlaceholder}
               />
             </div>
 
             <div>
               <label for="subject" class="block text-sm text-soy-brown/70 mb-2">
-                Subject
+                {getT().subject}
               </label>
               <select
                 id="subject"
@@ -177,18 +191,18 @@
                        focus:outline-none focus:border-fulala-red transition-colors
                        disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">Select a topic...</option>
-                <option value="general">General Inquiry</option>
-                <option value="reservation">Reservation</option>
-                <option value="catering">Catering</option>
-                <option value="feedback">Feedback</option>
-                <option value="other">Other</option>
+                <option value="">{getT().selectTopic}</option>
+                <option value="general">{getT().optGeneral}</option>
+                <option value="reservation">{getT().optReservation}</option>
+                <option value="catering">{getT().optCatering}</option>
+                <option value="feedback">{getT().optFeedback}</option>
+                <option value="other">{getT().optOther}</option>
               </select>
             </div>
 
             <div>
               <label for="message" class="block text-sm text-soy-brown/70 mb-2">
-                Message
+                {getT().message}
               </label>
               <textarea
                 id="message"
@@ -199,7 +213,7 @@
                 class="w-full px-4 py-3 bg-white border-2 border-tiger-orange rounded-lg
                        focus:outline-none focus:border-fulala-red transition-colors resize-none
                        disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Tell us what's on your mind..."
+                placeholder={getT().messagePlaceholder}
               ></textarea>
             </div>
 
@@ -211,10 +225,10 @@
               {#if formState === 'sending'}
                 <span class="inline-flex items-center gap-2">
                   <span class="animate-spin">🥟</span>
-                  Sending...
+                  {getT().sending}
                 </span>
               {:else}
-                Send Message
+                {getT().sendBtn}
               {/if}
             </button>
           </form>
@@ -230,27 +244,15 @@
       class="mt-20"
     >
       <h2 class="text-3xl text-ink-black text-center mb-8">
-        Common Questions
+        {getT().commonQuestions}
       </h2>
 
       <div class="grid md:grid-cols-2 gap-6">
         {#each [
-          {
-            q: 'Do you take reservations?',
-            a: 'Yes! You can book a table by email or phone. Walk-ins are also welcome.',
-          },
-          {
-            q: 'Is there vegetarian options?',
-            a: 'Absolutely! Our Zen Garden dumplings and many sides are vegetarian-friendly.',
-          },
-          {
-            q: 'Do you offer catering?',
-            a: 'We do! Contact us for catering inquiries and we\'ll create a custom menu.',
-          },
-          {
-            q: 'Can I buy dumplings to take home?',
-            a: 'Yes, frozen dumplings are available for takeaway. Ask our team!',
-          },
+          { q: getT().faq1q, a: getT().faq1a },
+          { q: getT().faq2q, a: getT().faq2a },
+          { q: getT().faq3q, a: getT().faq3a },
+          { q: getT().faq4q, a: getT().faq4a },
         ] as faq}
           <div class="p-6 bg-tiger-orange/20 rounded-xl">
             <h3 class="text-lg text-ink-black mb-2">{faq.q}</h3>

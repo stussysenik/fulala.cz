@@ -1,4 +1,4 @@
-@import '@fontsource/chewy/400.css';
+@import '@fontsource/poppins/600.css';
 @import '@fontsource/outfit/400.css';
 @import '@fontsource/outfit/500.css';
 @import '@fontsource/outfit/600.css';
@@ -7,14 +7,14 @@
 /* Tailwind v4 CSS-based configuration */
 @theme {
   /* Brand Colors */
-  --color-fulala-red: #EF4136;
+  --color-fulala-red: #E83636;
   --color-tiger-orange: #FCEBDC;
   --color-dough-white: #FFFFFF;
   --color-soy-brown: #6B3900;
   --color-ink-black: #000000;
 
   /* Typography */
-  --font-heading: 'Chewy', cursive;
+  --font-heading: 'Poppins', sans-serif;
   --font-body: 'Outfit', sans-serif;
 }
 
@@ -33,7 +33,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.1;
 }
 

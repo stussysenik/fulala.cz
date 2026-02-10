@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fly, fade } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { getT } from '$lib/i18n/store.svelte';
 
   let mounted = $state(false);
 
@@ -8,33 +9,36 @@
     mounted = true;
   });
 
-  const storyContent = [
-    {
-      section: 'intro',
-      title: 'Old School New Soul',
-      content: `At Fulala, we believe in the magic of handmade dumplings. Each one is crafted with love, following recipes passed down through generations. Our name "Fulala" captures the whimsical joy we want to bring to every meal.`,
-    },
-    {
-      section: 'origin',
-      title: 'Born in Prague',
-      content: `Our journey began in the heart of Prague, where we set out to bring authentic Chinese comfort food to the Czech Republic. We wanted to create a space where traditional flavors meet modern hospitality - a place where every visitor feels like family.`,
-    },
-    {
-      section: 'mascot',
-      title: 'Meet the Tiger',
-      content: `Our playful tiger mascot embodies the bold, spirited nature of our kitchen. In Chinese culture, the tiger represents courage, power, and good fortune. For us, it's also a reminder to approach cooking with passion and fearlessness.`,
-    },
-    {
-      section: 'values',
-      title: 'Rituals of Joy',
-      content: `We believe eating should be a joyful ritual. Fresh ingredients sourced daily, traditional techniques honored carefully, and a whole lot of heart goes into every dish we serve. This isn't just food - it's an experience.`,
-    },
-  ];
+  function getStoryContent() {
+    const t = getT();
+    return [
+      {
+        section: 'intro',
+        title: t.storyIntroTitle,
+        content: t.storyIntroContent,
+      },
+      {
+        section: 'origin',
+        title: t.storyOriginTitle,
+        content: t.storyOriginContent,
+      },
+      {
+        section: 'mascot',
+        title: t.storyMascotTitle,
+        content: t.storyMascotContent,
+      },
+      {
+        section: 'values',
+        title: t.storyValuesTitle,
+        content: t.storyValuesContent,
+      },
+    ];
+  }
 </script>
 
 <svelte:head>
-  <title>Our Story | Fulala</title>
-  <meta name="description" content="The story behind Fulala - where traditional Chinese comfort food meets modern Prague." />
+  <title>{getT().navStory} | FULALA</title>
+  <meta name="description" content="The story behind FULALA - where traditional Chinese comfort food meets modern Prague." />
 </svelte:head>
 
 <div class="max-w-4xl mx-auto px-6 py-12">
@@ -42,17 +46,17 @@
   {#if mounted}
     <div in:fly={{ y: -20, duration: 400 }} class="text-center mb-16">
       <h1 class="text-5xl md:text-7xl text-fulala-red text-shadow mb-4">
-        OUR STORY
+        {getT().storyPageTitle}
       </h1>
       <p class="text-lg text-soy-brown/70 max-w-2xl mx-auto">
-        From family kitchen to Prague's heart
+        {getT().storySubtitle}
       </p>
     </div>
   {/if}
 
   <!-- Story Sections -->
   <div class="space-y-20">
-    {#each storyContent as section, index}
+    {#each getStoryContent() as section, index}
       {#if mounted}
         <section
           in:fly={{ y: 40, duration: 500, delay: 200 + index * 150 }}
@@ -72,7 +76,7 @@
           <div class="{index % 2 === 1 ? 'md:order-1' : ''}">
             <div class="aspect-square bg-tiger-orange/50 rounded-3xl flex items-center justify-center relative overflow-hidden">
               <!-- Decorative elements -->
-              <div class="absolute inset-4 border-2 border-dashed border-soy-brown/20 rounded-2xl"></div>
+              <div class="absolute inset-4 border-2 border-solid border-fulala-red/30 rounded-2xl"></div>
 
               <!-- Section-specific visuals -->
               {#if section.section === 'intro'}
@@ -103,11 +107,10 @@
       class="mt-24 text-center"
     >
       <h2 class="text-4xl md:text-5xl text-fulala-red text-shadow-sm mb-8">
-        Behind the Scenes
+        {getT().storyBtsTitle}
       </h2>
       <p class="text-lg text-soy-brown/70 max-w-2xl mx-auto mb-12">
-        Every morning, our team gathers to prepare fresh ingredients, fold dumplings by hand,
-        and bring the spirit of authentic Chinese cooking to life.
+        {getT().storyBtsContent}
       </p>
 
       <!-- BTS Gallery Placeholder -->
@@ -132,17 +135,17 @@
       class="mt-24 text-center p-8 bg-tiger-orange/30 rounded-2xl"
     >
       <h3 class="text-2xl text-ink-black mb-4">
-        Ready to taste the story?
+        {getT().storyCtaTitle}
       </h3>
       <p class="text-soy-brown/70 mb-6">
-        Come visit us and become part of the Fulala family.
+        {getT().storyCtaContent}
       </p>
       <div class="flex flex-wrap justify-center gap-4">
         <a href="/menu" class="btn-primary">
-          View Menu
+          {getT().viewMenu}
         </a>
         <a href="/contact" class="btn-secondary">
-          Find Us
+          {getT().findUs}
         </a>
       </div>
     </section>

@@ -69,7 +69,7 @@
 </script>
 
 <svelte:head>
-  <title>QR Codes - Fulala Admin</title>
+  <title>QR Codes - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

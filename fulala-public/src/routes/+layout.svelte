@@ -7,6 +7,7 @@
   import Navigation from '$lib/components/Navigation.svelte';
   import IdleHelper from '$lib/components/IdleHelper.svelte';
   import { onMount } from 'svelte';
+  import { getT } from '$lib/i18n/store.svelte';
 
   // Setup Convex client
   setupConvex(PUBLIC_CONVEX_URL);
@@ -20,7 +21,7 @@
 </script>
 
 <svelte:head>
-  <title>Fulala - Old School New Soul</title>
+  <title>FULALA - Old School New Soul</title>
   <meta name="description" content="Comfort Chinese dishes in Prague. Handmade dumplings with love." />
 </svelte:head>
 
@@ -39,21 +40,18 @@
     {/key}
   </main>
 
-  <footer class="py-8 px-6 border-t-2 border-dashed border-tiger-orange">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="text-center md:text-left">
-        <h3 class="text-2xl text-fulala-red">Fulala</h3>
-        <p class="text-sm opacity-75">Old School New Soul</p>
-      </div>
-      <div class="flex gap-6 text-sm">
-        <a href="/menu" class="hover:text-fulala-red transition-colors">Menu</a>
-        <a href="/story" class="hover:text-fulala-red transition-colors">Our Story</a>
-        <a href="/contact" class="hover:text-fulala-red transition-colors">Contact</a>
-      </div>
-      <p class="text-xs opacity-50">
-        &copy; {new Date().getFullYear()} Fulala. Made with dumplings.
-      </p>
-    </div>
+  <footer class="relative z-10 border-t-2 border-solid border-fulala-red bg-tiger-orange/40">
+    <p class="whitespace-nowrap text-center text-sm py-5 px-6">
+      <a href="/menu" class="hover:text-fulala-red transition-colors">{getT().navMenu}</a>
+      <span class="mx-2 opacity-30">&middot;</span>
+      <a href="/reservations" class="hover:text-fulala-red transition-colors">{getT().navReservations}</a>
+      <span class="mx-2 opacity-30">&middot;</span>
+      <a href="/story" class="hover:text-fulala-red transition-colors">{getT().navStory}</a>
+      <span class="mx-2 opacity-30">&middot;</span>
+      <a href="/contact" class="hover:text-fulala-red transition-colors">{getT().navContact}</a>
+      <span class="mx-3 opacity-30">|</span>
+      <span class="text-xs opacity-50">&copy; {new Date().getFullYear()} {getT().footerCopyright}</span>
+    </p>
   </footer>
 
   <!-- Idle helper tooltip -->

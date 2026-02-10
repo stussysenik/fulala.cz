@@ -85,7 +85,7 @@
 </script>
 
 <svelte:head>
-  <title>Tables - Fulala Admin</title>
+  <title>Tables - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

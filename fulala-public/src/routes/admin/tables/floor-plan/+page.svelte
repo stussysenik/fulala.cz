@@ -75,7 +75,7 @@
 </script>
 
 <svelte:head>
-  <title>Floor Plan - Fulala Admin</title>
+  <title>Floor Plan - FULALA Admin</title>
 </svelte:head>
 
 <svelte:window onmousemove={handleMouseMove} onmouseup={handleMouseUp} />

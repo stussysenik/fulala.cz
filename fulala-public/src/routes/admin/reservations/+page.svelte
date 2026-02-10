@@ -105,7 +105,7 @@
 </script>
 
 <svelte:head>
-  <title>Reservations - Fulala Admin</title>
+  <title>Reservations - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

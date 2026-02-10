@@ -132,7 +132,7 @@
 </script>
 
 <svelte:head>
-  <title>Menu Management - Fulala Admin</title>
+  <title>Menu Management - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

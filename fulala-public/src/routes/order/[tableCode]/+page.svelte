@@ -120,7 +120,7 @@
 </script>
 
 <svelte:head>
-  <title>{qrCodeQuery.data?.table?.name || 'Order'} - Fulala</title>
+  <title>{qrCodeQuery.data?.table?.name || 'Order'} - FULALA</title>
 </svelte:head>
 
 <main class="min-h-screen bg-tiger-orange/30 pb-24">
@@ -130,7 +130,7 @@
       <div class="flex items-center gap-3">
         <span class="text-2xl">🥟</span>
         <div>
-          <h1 class="font-chewy text-xl text-fulala-red">Fulala</h1>
+          <h1 class="font-heading text-xl text-fulala-red">FULALA</h1>
           {#if qrCodeQuery.data?.table}
             <p class="text-xs text-soy-brown">{qrCodeQuery.data.table.name}</p>
           {/if}
@@ -164,7 +164,7 @@
             </svg>
           </div>
 
-          <h2 class="font-chewy text-3xl text-fulala-red">Order Placed!</h2>
+          <h2 class="font-heading text-3xl text-fulala-red">Order Placed!</h2>
           <p class="mt-2 text-soy-brown">Your order is being prepared</p>
 
           <div class="mt-6 rounded-xl bg-tiger-orange/50 p-4">
@@ -265,7 +265,7 @@
       transition:fly={{ y: 300, duration: 300 }}
     >
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="font-chewy text-2xl text-fulala-red">Your Order</h2>
+        <h2 class="font-heading text-2xl text-fulala-red">Your Order</h2>
         <button
           class="rounded-full p-2 hover:bg-neutral-100"
           onclick={() => (showCart = false)}

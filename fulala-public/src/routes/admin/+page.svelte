@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard - Fulala Admin</title>
+  <title>Dashboard - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

@@ -87,7 +87,7 @@
 </script>
 
 <svelte:head>
-  <title>Gallery - Fulala Admin</title>
+  <title>Gallery - FULALA Admin</title>
 </svelte:head>
 
 <AdminHeader

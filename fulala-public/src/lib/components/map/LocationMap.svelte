@@ -1,63 +1,46 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   interface Props {
     latitude?: number;
     longitude?: number;
     zoom?: number;
     markerTitle?: string;
     address?: string;
+    googleMapsUrl?: string;
     class?: string;
   }
 
   let {
-    latitude = 50.0755, // Prague default
-    longitude = 14.4378,
-    zoom = 15,
-    markerTitle = 'Fulala',
-    address = 'Prague, Czech Republic',
+    latitude = 50.0892311,
+    longitude = 14.4202074,
+    zoom = 17,
+    markerTitle = 'FULALA',
+    address = 'Kostečná 121/3, 110 00 Staré Město, Prague',
+    googleMapsUrl = 'https://maps.app.goo.gl/mE8kQm8nSKFb5P2H7',
     class: className = '',
   }: Props = $props();
 
-  let mapContainer: HTMLDivElement;
-
-  // Generate static map URL using OpenStreetMap
-  const staticMapUrl = $derived(
-    `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=${zoom}&size=600x400&markers=${latitude},${longitude},ol-marker`
+  // Google Maps embed URL (free, no API key needed)
+  const embedUrl = $derived(
+    `https://www.google.com/maps?q=${latitude},${longitude}&z=${zoom}&t=k&output=embed`
   );
 
   // Google Maps directions URL
   const directionsUrl = $derived(
-    `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
-  );
-
-  // Apple Maps URL (for iOS)
-  const appleMapsUrl = $derived(
-    `https://maps.apple.com/?daddr=${latitude},${longitude}`
+    googleMapsUrl || `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
   );
 </script>
 
 <div class="overflow-hidden rounded-xl {className}">
-  <!-- Static Map Image -->
+  <!-- Interactive Google Maps Embed -->
   <div class="relative aspect-video w-full bg-neutral-100">
-    <img
-      src={staticMapUrl}
-      alt="Map showing {markerTitle} location"
-      class="h-full w-full object-cover"
+    <iframe
+      src={embedUrl}
+      title="Map showing {markerTitle} at {address}"
+      class="h-full w-full border-0"
       loading="lazy"
-    />
-
-    <!-- Overlay with marker icon -->
-    <div class="absolute inset-0 flex items-center justify-center">
-      <div class="flex flex-col items-center">
-        <div class="rounded-full bg-fulala-red p-3 shadow-lg">
-          <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-          </svg>
-        </div>
-        <div class="mt-1 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[10px] border-l-transparent border-r-transparent border-t-fulala-red"></div>
-      </div>
-    </div>
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+    ></iframe>
   </div>
 
   <!-- Address & Directions -->
@@ -73,7 +56,7 @@
           href={directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center gap-1 rounded-lg bg-fulala-red px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
+          class="flex items-center gap-1 rounded-lg bg-fulala-red px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
         >
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

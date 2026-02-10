@@ -55,8 +55,8 @@
 </script>
 
 <svelte:head>
-  <title>Gallery - Fulala</title>
-  <meta name="description" content="Browse our photo gallery showcasing delicious dumplings, our cozy restaurant interior, and the Fulala team." />
+  <title>Gallery - FULALA</title>
+  <meta name="description" content="Browse our photo gallery showcasing delicious dumplings, our cozy restaurant interior, and the FULALA team." />
 </svelte:head>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -65,9 +65,9 @@
   <div class="mx-auto max-w-7xl px-4">
     <!-- Header -->
     <div class="mb-12 text-center">
-      <h1 class="font-chewy text-5xl text-fulala-red md:text-6xl">Gallery</h1>
+      <h1 class="font-heading text-5xl text-fulala-red md:text-6xl">Gallery</h1>
       <p class="mt-4 text-lg text-soy-brown">
-        A glimpse into the Fulala experience
+        A glimpse into the FULALA experience
       </p>
     </div>
 
