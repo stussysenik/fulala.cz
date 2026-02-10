@@ -148,8 +148,9 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_active", ["isActive"]),
 
-  // Reservations - Table bookings
+  // Reservations - Table bookings & space bookings
   reservations: defineTable({
+    reservationType: v.optional(v.union(v.literal("table"), v.literal("space"))), // "table" default for backward compat
     tableId: v.optional(v.id("tables")), // Can assign later
     guestName: v.string(),
     phone: v.string(),
@@ -158,6 +159,7 @@ export default defineSchema({
     date: v.string(), // "2025-01-21"
     timeSlot: v.string(), // "18:00"
     endTime: v.optional(v.string()), // "20:00"
+    eventType: v.optional(v.string()), // For space bookings: "party", "meeting", "dinner", "workshop", "other"
     status: reservationStatus,
     notes: v.optional(v.string()),
     specialRequests: v.optional(v.string()),

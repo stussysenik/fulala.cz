@@ -87,6 +87,7 @@ export const getUpcoming = query({
 // Create new reservation
 export const create = mutation({
   args: {
+    reservationType: v.optional(v.union(v.literal("table"), v.literal("space"))),
     guestName: v.string(),
     phone: v.string(),
     email: v.optional(v.string()),
@@ -94,15 +95,43 @@ export const create = mutation({
     date: v.string(),
     timeSlot: v.string(),
     endTime: v.optional(v.string()),
+    eventType: v.optional(v.string()),
     notes: v.optional(v.string()),
     specialRequests: v.optional(v.string()),
     tableId: v.optional(v.id("tables")),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+    const type = args.reservationType || "table";
 
-    // Check for conflicting reservations on the same table
-    if (args.tableId) {
+    // For space bookings, check for conflicting space reservations
+    if (type === "space") {
+      const existing = await ctx.db
+        .query("reservations")
+        .withIndex("by_date", (q) => q.eq("date", args.date))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("reservationType"), "space"),
+            q.neq(q.field("status"), "cancelled"),
+            q.neq(q.field("status"), "no_show")
+          )
+        )
+        .collect();
+
+      // Check for time overlap
+      for (const r of existing) {
+        const existingStart = r.timeSlot;
+        const existingEnd = r.endTime || r.timeSlot;
+        const newStart = args.timeSlot;
+        const newEnd = args.endTime || args.timeSlot;
+        if (newStart < existingEnd && newEnd > existingStart) {
+          throw new Error("The downstairs space is already booked for this time period");
+        }
+      }
+    }
+
+    // For table bookings, check table conflicts
+    if (type === "table" && args.tableId) {
       const existing = await ctx.db
         .query("reservations")
         .withIndex("by_table", (q) => q.eq("tableId", args.tableId!))
@@ -122,6 +151,7 @@ export const create = mutation({
     }
 
     return await ctx.db.insert("reservations", {
+      reservationType: type,
       guestName: args.guestName,
       phone: args.phone,
       email: args.email,
@@ -129,6 +159,7 @@ export const create = mutation({
       date: args.date,
       timeSlot: args.timeSlot,
       endTime: args.endTime,
+      eventType: args.eventType,
       notes: args.notes,
       specialRequests: args.specialRequests,
       tableId: args.tableId,
@@ -324,6 +355,39 @@ export const getAvailableSlots = query({
         available: availableTables.length > 0,
         tablesAvailable: availableTables.length,
       };
+    });
+  },
+});
+
+// Get space availability for a date
+export const getSpaceAvailability = query({
+  args: { date: v.string() },
+  handler: async (ctx, args) => {
+    const timeBlocks = [
+      { id: "morning", label: "11:00 – 15:00", start: "11:00", end: "15:00" },
+      { id: "afternoon", label: "15:00 – 18:00", start: "15:00", end: "18:00" },
+      { id: "evening", label: "18:00 – 22:00", start: "18:00", end: "22:00" },
+      { id: "full_day", label: "11:00 – 22:00", start: "11:00", end: "22:00" },
+    ];
+
+    const spaceReservations = await ctx.db
+      .query("reservations")
+      .withIndex("by_date", (q) => q.eq("date", args.date))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("reservationType"), "space"),
+          q.neq(q.field("status"), "cancelled"),
+          q.neq(q.field("status"), "no_show")
+        )
+      )
+      .collect();
+
+    return timeBlocks.map((block) => {
+      const isBooked = spaceReservations.some((r) => {
+        const rEnd = r.endTime || r.timeSlot;
+        return r.timeSlot < block.end && rEnd > block.start;
+      });
+      return { ...block, available: !isBooked };
     });
   },
 });
