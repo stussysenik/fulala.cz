@@ -4,14 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        'fulala-red': '#FB3000',
+        'fulala-red': '#E83636',
         'tiger-orange': '#FCEBDC',
-        'dough-white': '#FF8A14',
+        'dough-white': '#FFFFFF',
         'soy-brown': '#6B3900',
         'ink-black': '#000000',
       },
       fontFamily: {
-        heading: ['Chewy', 'cursive'],
+        heading: ['Fredoka', 'cursive'],
         body: ['Outfit', 'sans-serif'],
       },
     },
