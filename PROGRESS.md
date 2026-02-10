@@ -1,295 +1,104 @@
-# Fulala Platform v2 - Progress Tracker
+# FULALA — Progress
 
-## Overview
-This document tracks the implementation progress of Fulala Site Builder v2, a comprehensive restaurant platform built with SvelteKit and Convex.
-
-**Live Site:** https://fulala-public.vercel.app
+**Live:** [fulala.cz](https://fulala.cz) · **Menu:** [menu.fulala.cz](https://menu.fulala.cz)
 
 ---
 
-## Implementation Status
+## Current State (February 2026)
 
-### Phase 1: Foundation (Core Infrastructure) ✅ COMPLETE
+Both sites are deployed and live. All features below are in production.
 
-#### 1.1 Schema Updates ✅
-- [x] orders table with status workflow
-- [x] tables table with position data
-- [x] reservations table with time slots
-- [x] qrCodes table with scan tracking
-- [x] galleryItems table
-- [x] floorPlans table
-- [x] adminUsers table
-- [x] adminSessions table
-- [x] Type definitions for all enums
+### Completed
 
-#### 1.2 Convex Functions ✅
-- [x] `convex/orders.ts` - Order CRUD, status transitions, stats
-- [x] `convex/tables.ts` - Table management, position updates
-- [x] `convex/reservations.ts` - Booking system, available slots
-- [x] `convex/qrCodes.ts` - QR generation, scan tracking
-- [x] `convex/gallery.ts` - Gallery items, categories
-- [x] `convex/floorPlans.ts` - Floor plan CRUD
-- [x] `convex/auth.ts` - Login/logout, session management
+**Foundation**
+- [x] SvelteKit 2 + Svelte 5 monorepo with Convex backend
+- [x] 13-table database schema (menu, orders, tables, reservations, QR, gallery, auth, settings)
+- [x] Tailwind CSS v4 with custom brand tokens
+- [x] Nix flake for reproducible dev environment
 
-#### 1.3 Grid System ✅
-- [x] `Grid.svelte` - CSS Grid container
-- [x] `GridItem.svelte` - Grid cell with span options
-- [x] `GridGallery.svelte` - Masonry variant for images
+**Public Website**
+- [x] Homepage with tiger mascot, hero, feature cards
+- [x] i18n — Czech (default), English, Chinese
+- [x] Menu page — iframe embed of `menu.fulala.cz`
+- [x] Story page — 4 sections with BTS gallery
+- [x] Contact page — form, map, localized emails, FAQ
+- [x] Gallery — masonry grid, category filter, lightbox
+- [x] Reservations — table booking, space booking (with time-block conflict detection), lookup by phone
+- [x] QR table ordering — scan, browse, add to cart, submit
 
-#### 1.4 UI Component Library ✅
-- [x] `Button.svelte` - Primary/secondary/ghost variants
-- [x] `Input.svelte` - Form input with labels
-- [x] `Select.svelte` - Dropdown select
-- [x] `Card.svelte` - Content card container
-- [x] `Badge.svelte` - Status badges with colors
-- [x] `Dialog.svelte` - Modal dialogs
-- [x] `DataTable.svelte` - Sortable data tables
-- [x] `Tabs.svelte` - Tab navigation
+**Admin Dashboard**
+- [x] Session-based auth with HttpOnly cookies
+- [x] Dashboard with order/revenue/table/reservation metrics
+- [x] Menu CRUD with images and category management
+- [x] Real-time order tracking with full status workflow
+- [x] Table management + visual floor plan editor (drag-drop)
+- [x] Reservation management with date/status filters
+- [x] QR code generation with scan tracking
+- [x] Gallery + media library with drag-drop upload
 
----
-
-### Phase 2: Admin Dashboard ✅ COMPLETE
-
-#### 2.1 Admin Layout ✅
-- [x] `+layout.svelte` - Sidebar navigation shell
-- [x] `+layout.server.ts` - Auth middleware
-- [x] `+page.svelte` - Dashboard with metrics
-
-#### 2.2 Authentication ✅
-- [x] Login page at `/admin/login`
-- [x] Session-based auth via Convex
-- [x] HttpOnly cookies for security
-- [x] Demo credentials: admin@fulala.cz / admin123
-
-#### 2.3 Menu Management ✅
-- [x] DataTable with all menu items
-- [x] Add/Edit/Delete functionality
-- [x] Image display
-- [x] Category filter
-
-#### 2.4 Categories ✅
-- [x] Category CRUD interface
-- [x] Slug generation
-
-#### 2.5 Media Library ✅
-- [x] Grid view of all uploads
-- [x] Drag-drop upload
-- [x] File type display
-- [x] Delete functionality
+**Infrastructure**
+- [x] Vercel auto-deploy from `main` (Root Directory: `fulala-public`)
+- [x] Convex production deployment
+- [x] `PUBLIC_CONVEX_URL` + `PUBLIC_LIVE_MENU_URL` env vars configured
+- [x] Playwright E2E test setup
 
 ---
 
-### Phase 3: Restaurant Operations ✅ COMPLETE
+## Deployment History
 
-#### 3.1 Tables Management ✅
-- [x] Table list with status badges
-- [x] Add/edit/delete tables
-- [x] Capacity and shape settings
-- [x] Status toggle
-
-#### 3.2 Floor Plan Editor ✅
-- [x] Visual editor canvas
-- [x] Drag-drop table placement
-- [x] Table shapes (round, square, rectangle)
-- [x] Save layout
-- [x] Add new tables from editor
-
-#### 3.3 Orders System ✅
-- [x] Real-time order list
-- [x] Status workflow (pending → preparing → ready → served)
-- [x] Filter by status
-- [x] Order details with items
-- [x] Quick status actions
-
-#### 3.4 QR Codes ✅
-- [x] Generate QR for tables
-- [x] QR code display/preview
-- [x] Scan tracking stats
-- [x] Active/inactive toggle
-- [x] Download QR codes
+| Date | What |
+|------|------|
+| Feb 11, 2026 | Fixed Vercel deployment (Root Directory + env var), production now matches local |
+| Jan 22, 2026 | Tailwind v4 migration, font updates, homepage/footer redesign |
+| Jan 21, 2026 | Last successful Vercel build before 20-day outage |
+| Jan 21, 2026 | Initial deployment — full platform with admin dashboard |
 
 ---
 
-### Phase 4: Public Features ✅ COMPLETE
+## What's Next
 
-#### 4.1 Reservations Admin ✅
-- [x] Reservation list view
-- [x] Status management
-- [x] Guest details display
-- [x] Filter by date/status
+### Polish
+- [ ] E2E tests for admin flows
+- [ ] Form validation (Zod)
+- [ ] Toast notifications for mutations
+- [ ] Loading states on all buttons
+- [ ] Mobile admin improvements
+- [ ] Fix Svelte 5 `state_referenced_locally` warnings (Input, Select, Card, DataTable)
+- [ ] Add favicon.ico
 
-#### 4.2 Public Reservation Page ✅
-- [x] Date picker
-- [x] Time slot selection
-- [x] Party size selection
-- [x] Contact form
-- [x] Confirmation display
-
-#### 4.3 Photo Gallery ✅
-- [x] Masonry grid layout
-- [x] Category filtering
-- [x] Lightbox viewer
-- [x] Keyboard navigation
-
-#### 4.4 QR Table Ordering ✅
-- [x] Menu display by category
-- [x] Add to cart functionality
-- [x] Cart drawer
-- [x] Order submission
-- [x] Order confirmation
-
-#### 4.5 Map View ✅
-- [x] Static map image
-- [x] Custom brand marker
-- [x] Directions link (Google Maps + Apple Maps)
-
----
-
-### Phase 5: Live Data Integration ✅ COMPLETE
-
-#### 5.1 Replace Mock Data ✅
-- [x] Menu page uses `useQuery(api.menu.list)`
-- [x] Categories fetched from Convex
-- [x] Real-time subscriptions active
-
-#### 5.2 Real-time Admin ✅
-- [x] Convex subscriptions for live updates
-- [x] Orders refresh in real-time
-- [x] Table status updates instantly
-
----
-
-### Phase 6: Deployment ✅ COMPLETE
-
-#### 6.1 Convex Production ✅
-- [x] Deploy Convex to production (`jovial-perch-285.convex.cloud`)
-- [x] Fix TypeScript errors in Convex functions
-- [x] Configure production environment
-
-#### 6.2 Vercel Deployment ✅
-- [x] Configure `vercel.json` for SvelteKit
-- [x] Set up `PUBLIC_CONVEX_URL` environment variable
-- [x] Fix convex-svelte API patterns in all files
-- [x] Fix import paths to use `$convex` alias
-- [x] Configure a11y warning suppression
-- [x] Deploy to production: https://fulala-public.vercel.app
-
-#### 6.3 Documentation ✅
-- [x] Update README.md with deployment info
-- [x] Update DOCUMENTATION.md with correct convex-svelte patterns
-- [x] Update PROGRESS.md with deployment status
-
----
-
-### Repository Organization ✅ COMPLETE
-
-- [x] SvelteKit is the default (fulala-public/)
-- [x] Legacy code archived (archive/nextjs/, archive/phoenix/)
-- [x] Updated README.md with v2 architecture
-- [x] Clear instructions for both options
-
----
-
-## Git Commits (Stacked)
-
-| Commit | Description |
-|--------|-------------|
-| `chore: archive legacy Next.js and Phoenix code` | Move original code to archive/ |
-| `feat: add Convex schema and backend functions for v2` | Database schema + 7 function files |
-| `feat: add Grid System and UI Component Library` | Grid + 8 UI components |
-| `feat: add Admin Dashboard with authentication` | Admin shell + 14 admin pages |
-| `feat: add public features (gallery, reservations, QR ordering, map)` | 4 public routes + map component |
-| `feat: integrate live Convex data and complete public site` | Live data + all public pages |
-| `docs: update README and add project configuration` | README v2 + config files |
-| `fix: convex-svelte API patterns and TypeScript errors` | Fix useQuery/useMutation patterns |
-| `feat: deploy to Vercel production` | Vercel config + deployment |
-| `docs: update documentation with deployment info` | Final docs update |
-
----
-
-## What's Next (Future Enhancements)
-
-### v2.1 - Polish
-- [ ] Add E2E tests for admin dashboard
-- [ ] Add form validation (Zod/Superforms)
-- [ ] Add toast notifications
-- [ ] Add loading states for all mutations
-- [ ] Improve mobile responsiveness in admin
-- [ ] Fix a11y warnings (add aria-labels to buttons)
-
-### v2.2 - Features
+### Features
 - [ ] Kitchen display system (KDS)
-- [ ] Email notifications for reservations
-- [ ] SMS notifications for orders
+- [ ] Email/SMS notifications for reservations
 - [ ] Print order tickets
 - [ ] Export reports (CSV/PDF)
+- [ ] Analytics dashboard (popular items, revenue, peak hours)
 
-### v2.3 - Shopify Integration
-- [ ] Merch store integration
-- [ ] Product sync from Shopify
-- [ ] Checkout redirect
-
-### v2.4 - Analytics
-- [ ] Order analytics dashboard
-- [ ] Popular items tracking
-- [ ] Revenue reports
-- [ ] Reservation analytics
-
-### v2.5 - Branding
-- [ ] Update brand colors to match logo (#EF4136)
-- [ ] Add logo assets to static folder
-- [ ] Display logo in navigation
+### Integration
+- [ ] Payment processing (Stripe)
+- [ ] Shopify merch store integration
 
 ---
 
 ## Technical Debt
 
-- [ ] Add proper TypeScript types for Convex API
+- [ ] Proper TypeScript types for Convex API responses
 - [ ] Extract common form logic into reusable hooks
-- [ ] Add error boundaries for graceful failures
-- [ ] Implement proper logging
-- [ ] Add rate limiting for public endpoints
+- [ ] Error boundaries for graceful failures
+- [ ] Rate limiting on public endpoints
+- [ ] Audit a11y (add ARIA labels to interactive elements)
 
 ---
 
-## Deployment Info
+## Key Files
 
-### URLs
-| Environment | URL |
-|-------------|-----|
-| Production Site | https://fulala-public.vercel.app |
-| Production Convex | https://jovial-perch-285.convex.cloud |
-| Dev Convex | https://determined-ram-534.convex.cloud |
-| Convex Dashboard | https://dashboard.convex.dev |
-
-### Environment Variables
-| Variable | Dev Value | Prod Value |
-|----------|-----------|------------|
-| `PUBLIC_CONVEX_URL` | determined-ram-534.convex.cloud | jovial-perch-285.convex.cloud |
+| File | Purpose |
+|------|---------|
+| `fulala-public/convex/schema.ts` | Database schema (13 tables) |
+| `fulala-public/src/routes/admin/+layout.server.ts` | Auth middleware |
+| `fulala-public/src/lib/i18n/translations.ts` | i18n strings (CZ/EN/中文) |
+| `fulala-public/src/routes/menu/+page.svelte` | Menu iframe embed |
+| `fulala-public/vercel.json` | Deployment config |
 
 ---
 
-## Notes
-
-### Development Commands
-```bash
-cd fulala-public
-bun run dev          # Start SvelteKit
-bunx convex dev      # Start Convex (separate terminal)
-```
-
-### Admin Access
-- URL: http://localhost:5173/admin (dev) or https://fulala-public.vercel.app/admin (prod)
-- Email: admin@fulala.cz
-- Password: admin123
-
-### Key Files
-- Schema: `fulala-public/convex/schema.ts`
-- Admin Auth: `fulala-public/src/routes/admin/+layout.server.ts`
-- UI Components: `fulala-public/src/lib/components/ui/`
-- Vercel Config: `fulala-public/vercel.json`
-- Svelte Config: `fulala-public/svelte.config.js`
-
----
-
-*Last Updated: January 21, 2026*
+*Last updated: February 11, 2026*

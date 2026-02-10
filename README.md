@@ -1,199 +1,94 @@
-# Fulala Site Builder v2
+# FULALA — Old School New Soul
 
-A comprehensive restaurant platform for Fulala featuring real-time ordering, table management, reservations, and an admin dashboard - all built with SvelteKit and Convex.
+A restaurant platform for [Fulala](https://fulala.cz) — fresh noodles, dumplings & snacks in Prague's Old Town. Public website with i18n, embedded live menu, reservations, gallery, and a full admin dashboard.
 
-**Live Site:** https://fulala-public.vercel.app
+**Live:** [fulala.cz](https://fulala.cz) · **Menu:** [menu.fulala.cz](https://menu.fulala.cz) · **Admin:** [fulala.cz/admin](https://fulala.cz/admin)
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 bun install && bun run install:app
-
-# Option 1: Run both servers together
-bun run dev:all
-
-# Option 2: Run separately (two terminals)
-bun run dev          # Terminal 1: SvelteKit
-bun run dev:convex   # Terminal 2: Convex
+bun run dev:all          # SvelteKit + Convex
 ```
 
-### Available Commands
+| URL | Service |
+|-----|---------|
+| `localhost:5175` | Public site |
+| `localhost:5175/admin` | Admin dashboard |
+| `dashboard.convex.dev` | Convex backend |
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start SvelteKit dev server |
-| `bun run dev:convex` | Start Convex dev server |
-| `bun run dev:all` | Start both concurrently |
-| `bun run build` | Build for production |
-| `bun run preview` | Preview production build |
-| `bun run test` | Run E2E tests |
+**Admin login:** `admin@fulala.cz` / `admin123`
 
-**URLs:**
-| Service | URL |
-|---------|-----|
-| Public Site (Local) | http://localhost:5173 |
-| Admin Dashboard | http://localhost:5173/admin |
-| Production Site | https://fulala-public.vercel.app |
-| Convex Dashboard | https://dashboard.convex.dev |
+## Stack
 
-**Admin Login:** `admin@fulala.cz` / `admin123`
+- **SvelteKit 2** + Svelte 5 (runes)
+- **Tailwind CSS v4**
+- **Convex** (real-time database + file storage)
+- **Vercel** (auto-deploy from `main`)
+- **Bun** (runtime + package manager)
 
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                      FULALA PLATFORM v2                              │
-├──────────────────────────────────────────────────────────────────────┤
-│  PUBLIC (/)                          ADMIN (/admin)                  │
-│  ┌────────────────────────┐         ┌────────────────────────┐      │
-│  │  Home, Menu, Story     │         │  Dashboard, Orders     │      │
-│  │  Contact, Gallery      │         │  Tables, Reservations  │      │
-│  │  Reservations, QR Order│         │  Floor Plan, QR Codes  │      │
-│  └───────────┬────────────┘         └───────────┬────────────┘      │
-│              └──────────────┬───────────────────┘                    │
-│                             │                                        │
-│              ┌──────────────┴──────────────┐                        │
-│              │         CONVEX              │                        │
-│              │   Real-time Database        │                        │
-│              │   + File Storage            │                        │
-│              └─────────────────────────────┘                        │
-└──────────────────────────────────────────────────────────────────────┘
+fulala.cz/
+├── fulala-public/              # SvelteKit app
+│   ├── src/routes/
+│   │   ├── (home, menu, story, contact, gallery, reservations)
+│   │   └── admin/ (dashboard, menu, orders, tables, floor-plan,
+│   │               reservations, qr-codes, gallery, media)
+│   ├── src/lib/
+│   │   ├── components/         # UI, admin, grid, map
+│   │   └── i18n/               # CZ / EN / 中文
+│   └── convex/                 # 13 tables, auth, CRUD
+├── archive/                    # Legacy Next.js + Phoenix code
+└── openspec/                   # Change proposals
 ```
 
-## Project Structure
+## Key Features
 
-```
-fulala/
-├── fulala-public/           # Main SvelteKit app (public + admin)
-│   ├── src/
-│   │   ├── routes/          # All pages
-│   │   │   ├── admin/       # Admin dashboard
-│   │   │   ├── gallery/     # Photo gallery
-│   │   │   ├── reservations/# Public booking
-│   │   │   ├── order/[tableCode]/ # QR ordering
-│   │   │   └── ...
-│   │   ├── lib/components/  # Shared components
-│   │   │   ├── ui/          # Button, Input, Card, etc.
-│   │   │   ├── admin/       # Admin-specific components
-│   │   │   ├── grid/        # Layout grid system
-│   │   │   └── map/         # Location map
-│   │   └── app.css          # Tailwind v4 styles
-│   ├── convex/              # Real-time backend
-│   │   ├── schema.ts        # Database schema
-│   │   ├── menu.ts          # Menu CRUD
-│   │   ├── orders.ts        # Order management
-│   │   ├── tables.ts        # Table management
-│   │   ├── reservations.ts  # Booking system
-│   │   ├── qrCodes.ts       # QR code handling
-│   │   ├── gallery.ts       # Gallery items
-│   │   ├── floorPlans.ts    # Floor plan data
-│   │   └── auth.ts          # Admin authentication
-│   └── tests/e2e/           # Playwright tests
-├── archive/                 # Legacy code (preserved)
-│   ├── nextjs/              # Original Next.js app
-│   └── phoenix/             # Phoenix LiveView admin
-├── scripts/setup.sh         # Setup script
-└── docker-compose.yml       # Docker dev setup
-```
+**Public** — i18n (CZ/EN/中文), live menu via iframe embed from `menu.fulala.cz`, table + space reservations, photo gallery with lightbox, contact with map, tiger mascot
 
-## Features
+**Admin** — Dashboard KPIs, menu CRUD with images, order tracking with status workflow, table management, visual floor plan editor, QR code generation, reservation management, media library
 
-### Public Site
-- **Menu** - Real-time menu with category filtering
-- **Gallery** - Masonry photo gallery with lightbox
-- **Reservations** - Online table booking
-- **QR Ordering** - Scan QR code at table to order
-- **Contact** - Map with directions
+## Commands
 
-### Admin Dashboard
-- **Dashboard** - Overview metrics
-- **Menu Management** - CRUD with image upload
-- **Category Management** - Organize menu items
-- **Orders** - Real-time order tracking with status workflow
-- **Tables** - Table capacity and status management
-- **Floor Plan** - Visual drag-drop table editor
-- **Reservations** - Manage bookings
-- **QR Codes** - Generate and manage table QR codes
-- **Gallery** - Manage photo gallery
-- **Media Library** - File upload and management
+| Command | What |
+|---------|------|
+| `bun run dev` | SvelteKit only |
+| `bun run dev:convex` | Convex only |
+| `bun run dev:all` | Both |
+| `bun run build` | Production build |
+| `bun run test` | Playwright E2E |
 
-### Real-time Features
-- Live order updates
-- Instant menu changes
-- Real-time table status
-- Collaborative floor plan editing
+## Environment
 
-## Tech Stack
-
-- **Frontend**: SvelteKit 2.49 + Svelte 5 (runes)
-- **Styling**: Tailwind CSS v4
-- **Database**: Convex (real-time)
-- **Authentication**: Session-based with HttpOnly cookies
-- **Components**: bits-ui headless components
-- **Deployment**: Vercel (frontend) + Convex Cloud (backend)
-
-## Brand Guidelines
-
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Fulala Red | #EF4136 | Primary, CTAs |
-| Tiger Orange | #FCEBDC | Backgrounds, borders |
-| Dough White | #FFFFFF | Page background |
-| Soy Brown | #6B3900 | Text, secondary |
-| Ink Black | #000000 | Headlines |
-
-**Typography**: Chewy (headings), Outfit (body)
+| Variable | Dev | Prod |
+|----------|-----|------|
+| `PUBLIC_CONVEX_URL` | `determined-ram-534.convex.cloud` | `jovial-perch-285.convex.cloud` |
+| `PUBLIC_LIVE_MENU_URL` | `http://localhost:5173` | `https://menu.fulala.cz` |
 
 ## Deployment
 
-### Vercel (Automatic)
-The site is configured for automatic deployment via Vercel:
+Vercel auto-deploys from `main`. Root Directory is set to `fulala-public`.
 
 ```bash
-# Manual deploy from fulala-public directory
-cd fulala-public
-vercel --prod
+# Manual deploy
+cd fulala-public && vercel --prod
+
+# Convex deploy
+cd fulala-public && bunx convex deploy --prod
 ```
 
-### Environment Variables
+## Brand
 
-**Local Development** (`.env.local`):
-```bash
-PUBLIC_CONVEX_URL=https://determined-ram-534.convex.cloud
-```
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Fulala Red | `#EF4136` | Primary, CTAs |
+| Tiger Orange | `#FCEBDC` | Backgrounds |
+| Soy Brown | `#6B3900` | Text |
 
-**Vercel Production**:
-- `PUBLIC_CONVEX_URL` = `https://jovial-perch-285.convex.cloud`
-
-### Convex Deployment
-
-```bash
-cd fulala-public
-
-# Deploy to production
-bunx convex deploy --prod
-```
-
-## Testing
-
-```bash
-cd fulala-public
-
-# Run E2E tests
-bun run test:e2e
-
-# Run with UI
-bun run test:e2e:ui
-```
-
-## Archive: Legacy Code
-
-The `archive/` directory contains the original implementations:
-
-- **archive/nextjs/** - Original Next.js app
-- **archive/phoenix/** - Phoenix LiveView admin dashboard
+**Fonts:** Chewy (headings) · Outfit (body)
 
 ---
 
-Built with love and dumplings.
+Kostecna 121/3, Prague 1 · Tue–Sun 11:00–21:00 · ahoj@fulala.cz
