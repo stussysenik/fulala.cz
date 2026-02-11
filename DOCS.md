@@ -39,10 +39,12 @@ A three-tab interface:
 Four sections telling the Fulala origin story: introduction, origins, the tiger mascot, and core values. Includes a behind-the-scenes gallery.
 
 ### Contact (`fulala.cz/contact`)
-Contact form, location map with direction links (Google Maps + Apple Maps), opening hours, and localized email addresses:
+Contact form, location map with direction links (Google Maps + Apple Maps), opening hours (Mon–Sun 11:00–22:00, open every day), and localized email addresses:
 - Czech: ahoj@fulala.cz, nazdar@fulala.cz
 - English: hello@fulala.cz
 - Chinese: nihao@fulala.cz
+- French: bonjour@fulala.cz
+- Italian: ciao@fulala.cz
 
 ### Gallery (`fulala.cz/gallery`)
 Masonry photo grid with category filtering (food, interior, team, events). Lightbox viewer with keyboard navigation (arrow keys, escape).
@@ -148,11 +150,19 @@ Both apps deploy to **Vercel** via auto-deploy from `main`:
 - `fulala.cz` — Vercel project `fulala-public` (Root Directory: `fulala-public`)
 - `menu.fulala.cz` — Vercel project `fulala-live-menu` (Region: fra1 Frankfurt)
 
+### IdleHelper
+A smart engagement bubble that appears after 15s of user inactivity (35s for subsequent appearances). Features:
+- Sequential message cycling with 5 localized messages per language (gentle → urgency → social proof → CTA)
+- Rotating emoji per appearance (tiger, dumpling, fire, sparkle, noodle)
+- 8s minimum display time — won't disappear from accidental mouse activity
+- Red glow pulse animation on appearance
+- CTA buttons link to menu and reservations
+
 ### i18n
 The main site supports three languages via a custom i18n store:
-- **Czech** (default) — Full translation of all UI, nav, content
+- **Czech** (default) — Full translation of all UI, nav, content, idle messages
 - **English** — Full translation
-- **Chinese** (中文) — Navigation and key content
+- **Chinese** (中文) — Full translation including idle messages
 
 The live menu supports Czech + English with a simple toggle.
 
@@ -223,4 +233,4 @@ Admin dashboard uses session-based auth with HttpOnly cookies (`fulala_admin_ses
 
 ---
 
-*Last updated: February 11, 2026*
+*Last updated: February 11, 2026 (hours, IdleHelper, contact updates)*

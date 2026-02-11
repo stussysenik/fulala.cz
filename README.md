@@ -46,7 +46,7 @@ fulala.cz/
 
 ## Key Features
 
-**Public** — i18n (CZ/EN/中文), live menu via iframe embed from `menu.fulala.cz`, table + space reservations, photo gallery with lightbox, contact with map, tiger mascot
+**Public** — i18n (CZ/EN/中文), live menu via iframe embed from `menu.fulala.cz`, table + space reservations, photo gallery with lightbox, contact with map, tiger mascot, idle engagement helper
 
 **Admin** — Dashboard KPIs, menu CRUD with images, order tracking with status workflow, table management, visual floor plan editor, QR code generation, reservation management, media library
 

@@ -23,8 +23,9 @@ Both sites are deployed and live. All features below are in production.
 - [x] Story page — 4 sections with BTS gallery
 - [x] Contact page — form, map, localized emails, FAQ
 - [x] Gallery — masonry grid, category filter, lightbox
-- [x] Reservations — table booking, space booking (with time-block conflict detection), lookup by phone
+- [x] Reservations — table booking (continuous 11:00–21:30 slots), space booking (with time-block conflict detection), lookup by phone
 - [x] QR table ordering — scan, browse, add to cart, submit
+- [x] IdleHelper — i18n engagement bubble with progressive messaging, 15s/35s timing, 8s min display
 
 **Admin Dashboard**
 - [x] Session-based auth with HttpOnly cookies
@@ -48,6 +49,7 @@ Both sites are deployed and live. All features below are in production.
 
 | Date | What |
 |------|------|
+| Feb 11, 2026 | Hours updated to Mon-Sun 11:00-22:00, IdleHelper i18n rewrite, removed RU flag, continuous reservation slots |
 | Feb 11, 2026 | Fixed Vercel deployment (Root Directory + env var), production now matches local |
 | Jan 22, 2026 | Tailwind v4 migration, font updates, homepage/footer redesign |
 | Jan 21, 2026 | Last successful Vercel build before 20-day outage |
