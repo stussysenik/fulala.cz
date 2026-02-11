@@ -91,4 +91,4 @@ cd fulala-public && bunx convex deploy --prod
 
 ---
 
-Kostecna 121/3, Prague 1 · Tue–Sun 11:00–21:00 · ahoj@fulala.cz
+Kostecna 121/3, Prague 1 · Mon–Sun 11:00–22:00 · ahoj@fulala.cz

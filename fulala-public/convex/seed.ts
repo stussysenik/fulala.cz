@@ -92,7 +92,7 @@ export const seedMenu = mutation({
       { key: "address", value: "Prague, Czech Republic", updatedAt: Date.now() },
       { key: "phone", value: "+420 XXX XXX XXX", updatedAt: Date.now() },
       { key: "email", value: "hello@fulala.cz", updatedAt: Date.now() },
-      { key: "openingHours", value: "Tue-Sun: 11:00 - 21:00", updatedAt: Date.now() },
+      { key: "openingHours", value: "Mon-Sun: 11:00 - 22:00", updatedAt: Date.now() },
     ];
 
     for (const setting of settings) {

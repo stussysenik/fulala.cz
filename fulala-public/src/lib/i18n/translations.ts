@@ -152,6 +152,13 @@ export interface TranslationStrings {
 
   // Language label
   langLabel: string;
+
+  // Idle helper messages
+  idleMsg1: string;
+  idleMsg2: string;
+  idleMsg3: string;
+  idleMsg4: string;
+  idleMsg5: string;
 }
 
 export const translations: Record<Lang, TranslationStrings> = {
@@ -211,8 +218,8 @@ export const translations: Record<Lang, TranslationStrings> = {
 
     addressValue: 'Kostečná 121/3, 110 00 Staré Město',
     addressSubtext: 'Praha, Česká republika',
-    hoursValue: 'Út – Ne: 11:00 – 21:00',
-    hoursClosed: 'Zavřeno v pondělí',
+    hoursValue: 'Po – Ne: 11:00 – 22:00',
+    hoursClosed: 'Otevřeno každý den',
     emailValue: 'hello@fulala.cz',
 
     yourName: 'Vaše jméno',
@@ -239,7 +246,7 @@ export const translations: Record<Lang, TranslationStrings> = {
     faq1q: 'Přijímáte rezervace?',
     faq1a: 'Ano! Stůl si můžete zarezervovat e-mailem nebo telefonicky. Vítáni jsou i hosté bez rezervace.',
     faq2q: 'Máte vegetariánské možnosti?',
-    faq2a: 'Samozřejmě! Naše knedlíčky Zen Garden a mnoho příloh jsou vhodné pro vegetariány.',
+    faq2a: 'Samozřejmě! Naše vegetariánské knedlíčky a mnoho příloh jsou vhodné pro vegetariány.',
     faq3q: 'Nabízíte catering?',
     faq3a: 'Ano! Kontaktujte nás ohledně cateringu a připravíme vám menu na míru.',
     faq4q: 'Mohu si koupit knedlíčky domů?',
@@ -300,6 +307,12 @@ export const translations: Record<Lang, TranslationStrings> = {
     footerCopyright: 'FULALA. Uděláno s knedlíčky.',
 
     langLabel: 'CZ',
+
+    idleMsg1: 'Nespěchejte, jsme tu pro vás...',
+    idleMsg2: 'Dnešní nabídka: ručně dělaná jídla!',
+    idleMsg3: 'Stolky se rychle plní, rezervujte si!',
+    idleMsg4: 'Přes 100 spokojených hostů tento týden!',
+    idleMsg5: 'Hlad? Naše menu vás potěší!',
   },
 
   en: {
@@ -358,8 +371,8 @@ export const translations: Record<Lang, TranslationStrings> = {
 
     addressValue: 'Kostečná 121/3, 110 00 Staré Město',
     addressSubtext: 'Prague, Czech Republic',
-    hoursValue: 'Tue - Sun: 11:00 - 21:00',
-    hoursClosed: 'Closed Mondays',
+    hoursValue: 'Mon - Sun: 11:00 - 22:00',
+    hoursClosed: 'Open every day',
     emailValue: 'hello@fulala.cz',
 
     yourName: 'Your Name',
@@ -386,7 +399,7 @@ export const translations: Record<Lang, TranslationStrings> = {
     faq1q: 'Do you take reservations?',
     faq1a: 'Yes! You can book a table by email or phone. Walk-ins are also welcome.',
     faq2q: 'Are there vegetarian options?',
-    faq2a: 'Absolutely! Our Zen Garden dumplings and many sides are vegetarian-friendly.',
+    faq2a: 'Absolutely! Our vegetarian dumplings and many sides are vegetarian-friendly.',
     faq3q: 'Do you offer catering?',
     faq3a: "We do! Contact us for catering inquiries and we'll create a custom menu.",
     faq4q: 'Can I buy dumplings to take home?',
@@ -447,6 +460,12 @@ export const translations: Record<Lang, TranslationStrings> = {
     footerCopyright: 'FULALA. Made with dumplings.',
 
     langLabel: 'EN',
+
+    idleMsg1: "Take your time, we're here when you're ready...",
+    idleMsg2: "Today's special: handmade dumplings!",
+    idleMsg3: 'Tables filling up fast tonight!',
+    idleMsg4: 'Join 100+ happy guests this week!',
+    idleMsg5: "Hungry? Our menu won't disappoint!",
   },
 
   zh: {
@@ -505,8 +524,8 @@ export const translations: Record<Lang, TranslationStrings> = {
 
     addressValue: 'Kostečná 121/3, 110 00 Staré Město',
     addressSubtext: '布拉格，捷克共和国',
-    hoursValue: '周二至周日：11:00 - 21:00',
-    hoursClosed: '周一休息',
+    hoursValue: '周一至周日：11:00 - 22:00',
+    hoursClosed: '每天营业',
     emailValue: 'hello@fulala.cz',
 
     yourName: '您的姓名',
@@ -594,5 +613,11 @@ export const translations: Record<Lang, TranslationStrings> = {
     footerCopyright: 'FULALA。用饺子做的。',
 
     langLabel: '中',
+
+    idleMsg1: '不着急，我们随时为您服务...',
+    idleMsg2: '今日特色：手工饺子！',
+    idleMsg3: '今晚座位快满了，快来预订！',
+    idleMsg4: '本周已有100多位满意的客人！',
+    idleMsg5: '饿了吗？我们的菜单不会让您失望！',
   },
 };

@@ -95,7 +95,6 @@
                   { addr: 'nihao@fulala.cz', flag: '🇨🇳' },
                   { addr: 'bonjour@fulala.cz', flag: '🇫🇷' },
                   { addr: 'ciao@fulala.cz', flag: '🇮🇹' },
-                  { addr: 'dobryden@fulala.cz', flag: '🇷🇺' },
                   { addr: 'nazdar@fulala.cz', flag: '🇨🇿' },
                 ] as item}
                   <a
