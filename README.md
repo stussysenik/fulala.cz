@@ -1,8 +1,21 @@
+<div align="center">
+
 # FULALA — Old School New Soul
 
-A restaurant platform for [Fulala](https://fulala.cz) — fresh noodles, dumplings & snacks in Prague's Old Town. Public website with i18n, embedded live menu, reservations, gallery, and a full admin dashboard.
+### Fresh noodles, dumplings & snacks in Prague
 
-**Live:** [fulala.cz](https://fulala.cz) · **Menu:** [menu.fulala.cz](https://menu.fulala.cz) · **Admin:** [fulala.cz/admin](https://fulala.cz/admin)
+![SvelteKit](https://img.shields.io/badge/SvelteKit-2-FF3E00?style=flat-square&logo=svelte&logoColor=white)
+![Convex](https://img.shields.io/badge/Convex-Realtime-EE5522?style=flat-square)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=flat-square&logo=vercel)
+
+[Live Site](https://fulala.vercel.app) · [Menu](https://menu.fulala.cz) · [Admin](https://fulala.cz/admin)
+
+</div>
+
+---
+
+A restaurant platform for [Fulala](https://fulala.cz) — fresh noodles, dumplings & snacks in Prague's Old Town. Public website with i18n, embedded live menu, reservations, gallery, and a full admin dashboard.
 
 ## Quick Start
 
