@@ -56,3 +56,6 @@ result
 
 # duplicate lockfile at root
 bun.lockb
+
+# extracted projects (now in separate repos)
+fulala-rails/
