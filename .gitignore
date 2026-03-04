@@ -53,3 +53,6 @@ result
 /*.jpg
 /*.PNG
 /*.png
+
+# duplicate lockfile at root
+bun.lockb

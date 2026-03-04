@@ -78,7 +78,7 @@
 
 {#if showHelper}
   <div
-    class="fixed bottom-28 right-6 z-[9998] max-w-xs"
+    class="fixed bottom-28 right-4 left-4 sm:left-auto sm:max-w-xs z-[60]"
     in:scale={{ duration: 400, start: 0.2, opacity: 0, easing: elasticOut }}
     out:scale={{ duration: 200, start: 0.2, opacity: 0, easing: backIn }}
   >

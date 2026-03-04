@@ -7,6 +7,7 @@
   import Navigation from '$lib/components/Navigation.svelte';
   import IdleHelper from '$lib/components/IdleHelper.svelte';
   import { onMount } from 'svelte';
+  import { dev } from '$app/environment';
   import { getT } from '$lib/i18n/store.svelte';
 
   // Setup Convex client
@@ -17,6 +18,10 @@
 
   onMount(() => {
     mounted = true;
+
+    if (dev) {
+      import('$lib/debug/overlap-detector').then(({ init }) => init());
+    }
   });
 </script>
 
@@ -40,18 +45,14 @@
     {/key}
   </main>
 
-  <footer class="relative z-10 border-t-2 border-solid border-fulala-red bg-tiger-orange/40">
-    <p class="whitespace-nowrap text-center text-sm py-5 px-6">
+  <footer class="relative z-10 border-t-2 border-solid border-fulala-red bg-tiger-orange/40 py-5 px-6">
+    <nav aria-label="Footer navigation" class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm">
       <a href="/menu" class="hover:text-fulala-red transition-colors">{getT().navMenu}</a>
-      <span class="mx-2 opacity-30">&middot;</span>
       <a href="/reservations" class="hover:text-fulala-red transition-colors">{getT().navReservations}</a>
-      <span class="mx-2 opacity-30">&middot;</span>
       <a href="/story" class="hover:text-fulala-red transition-colors">{getT().navStory}</a>
-      <span class="mx-2 opacity-30">&middot;</span>
       <a href="/contact" class="hover:text-fulala-red transition-colors">{getT().navContact}</a>
-      <span class="mx-3 opacity-30">|</span>
-      <span class="text-xs opacity-50">&copy; {new Date().getFullYear()} {getT().footerCopyright}</span>
-    </p>
+    </nav>
+    <p class="text-center text-xs opacity-50 mt-2">&copy; {new Date().getFullYear()} {getT().footerCopyright}</p>
   </footer>
 
   <!-- Idle helper tooltip -->

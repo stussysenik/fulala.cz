@@ -48,7 +48,7 @@
   <div class="grid md:grid-cols-2 gap-12">
     <!-- Contact Info -->
     {#if mounted}
-      <div in:fly={{ x: -30, duration: 500, delay: 200 }} class="space-y-8">
+      <div in:fly={{ y: 20, duration: 500, delay: 200 }} class="space-y-8">
         <h2 class="text-3xl text-ink-black mb-6">{getT().contactInfo}</h2>
 
         <div class="space-y-6">
@@ -124,7 +124,7 @@
 
     <!-- Contact Form -->
     {#if mounted}
-      <div in:fly={{ x: 30, duration: 500, delay: 300 }}>
+      <div in:fly={{ y: 20, duration: 500, delay: 300 }}>
         <h2 class="text-3xl text-ink-black mb-6">{getT().sendMessage}</h2>
 
         {#if formState === 'success'}
