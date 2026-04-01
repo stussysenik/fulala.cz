@@ -2,6 +2,9 @@
 
 # FULALA — Old School New Soul
 
+![Demo](demo.gif)
+
+
 ### Fresh noodles, dumplings & snacks in Prague
 
 ![SvelteKit](https://img.shields.io/badge/SvelteKit-2-FF3E00?style=flat-square&logo=svelte&logoColor=white)
